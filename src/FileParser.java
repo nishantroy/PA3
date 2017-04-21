@@ -7,7 +7,13 @@ import java.util.Scanner;
  */
 class FileParser {
     Network readNetwork(String fileName) throws Exception {
-        Scanner scanner = new Scanner(new File(fileName));
+        Scanner scanner;
+        try {
+            scanner = new Scanner(new File(fileName));
+        } catch (Exception e) {
+            throw new Exception("Error creating network. " + e.getMessage());
+        }
+
         Network network = new Network();
         int numRouters = Integer.parseInt(scanner.nextLine());
 
@@ -30,7 +36,14 @@ class FileParser {
     PriorityQueue<TopologicalEvent> readTopologicalEvents(String fileName) throws Exception {
         PriorityQueue<TopologicalEvent> pq = new PriorityQueue<>();
 
-        Scanner scanner = new Scanner(new File(fileName));
+        Scanner scanner;
+
+        try {
+            scanner = new Scanner(new File(fileName));
+        } catch (Exception e) {
+            throw new Exception("Error reading topological events. " + e.getMessage());
+        }
+
         String[] data;
         while (scanner.hasNextLine()) {
             data = scanner.nextLine().split(" ");

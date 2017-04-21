@@ -19,25 +19,26 @@ public class VectorRoutingSim {
     }
 
     private void regularRouting(int flag) {
-
+        Network network = this.network;
+        PriorityQueue<TopologicalEvent> events = this.events;
     }
 
     private void splitHorizon(int flag) {
-
+        Network network = this.network;
+        PriorityQueue<TopologicalEvent> events = this.events;
     }
 
     private void poisonReverse(int flag) {
-
+        Network network = this.network;
+        PriorityQueue<TopologicalEvent> events = this.events;
     }
 
 
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         if (args.length != 3) {
-            System.out.println("Please enter arguments as: <File with network topology> " +
+            throw new IllegalArgumentException("Please enter arguments as: <File with network topology> " +
                     "<File with topological events> <Binary flag>");
-            System.exit(1);
         }
 
         String[] routingAlgorithms = new String[]{"Regular", "Split Horizon", "Poison Reverse"};
@@ -46,21 +47,9 @@ public class VectorRoutingSim {
         String networkFile = args[0].trim();
         String eventFile = args[1].trim();
         int flag = Integer.parseInt(args[2].trim());
-        PriorityQueue<TopologicalEvent> originalEvents = new PriorityQueue<>();
-        Network originalNetwork = new Network();
 
-        try {
-            originalNetwork = fileParser.readNetwork(networkFile);
-        } catch (Exception e) {
-            System.out.println("Error creating network. Please check the file.");
-        }
-
-        try {
-            originalEvents = fileParser.readTopologicalEvents(eventFile);
-        } catch (Exception e) {
-            System.out.println("Error reading topological events. Please check the file.");
-            System.exit(1);
-        }
+        Network originalNetwork = fileParser.readNetwork(networkFile);
+        PriorityQueue<TopologicalEvent> originalEvents = fileParser.readTopologicalEvents(eventFile);
 
         for (String algorithm : routingAlgorithms) {
             System.out.println("ALGORITHM: " + algorithm);
