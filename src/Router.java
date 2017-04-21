@@ -1,6 +1,50 @@
 /**
- * Created by nishantroy on 4/19/17.
+ * Router Class
  */
-public class Router {
 
+class Router {
+    private int routerID;
+    private RoutingVector routingVector;
+
+    Router(int routerID) {
+        this.routerID = routerID;
+        this.routingVector = new RoutingVector();
+    }
+
+    Router(Router router) {
+        new Router(router.getRouterID());
+    }
+
+    public int getRouterID() {
+        return routerID;
+    }
+
+    public RoutingVector getRoutingVector() {
+        return routingVector;
+    }
+
+    public void setRouterID(int routerID) {
+        this.routerID = routerID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Router router = (Router) o;
+
+        return routerID == router.routerID;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(routerID);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(routerID);
+    }
 }
