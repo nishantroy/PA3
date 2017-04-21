@@ -35,7 +35,9 @@ public class VectorRoutingSim {
     public static void main(String[] args) {
 
         if (args.length != 3) {
-            System.out.println("Incorrect arguments. Please try again!");
+            System.out.println("Please enter arguments as: <File with network topology> " +
+                    "<File with topological events> <Binary flag>");
+            System.exit(1);
         }
 
         String[] routingAlgorithms = new String[]{"Regular", "Split Horizon", "Poison Reverse"};

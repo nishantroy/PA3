@@ -5,7 +5,7 @@ import java.util.Scanner;
 /**
  * Reads in Files
  */
-public class FileParser {
+class FileParser {
     Network readNetwork(String fileName) throws Exception {
         Scanner scanner = new Scanner(new File(fileName));
         Network network = new Network();
