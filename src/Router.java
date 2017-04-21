@@ -11,10 +11,6 @@ class Router {
         this.routingVector = new RoutingVector();
     }
 
-    Router(Router router) {
-        new Router(router.getRouterID());
-    }
-
     public int getRouterID() {
         return routerID;
     }
@@ -45,6 +41,6 @@ class Router {
 
     @Override
     public String toString() {
-        return String.valueOf(routerID);
+        return String.valueOf("ROUTER" + routerID);
     }
 }
