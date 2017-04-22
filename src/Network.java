@@ -1,6 +1,9 @@
 import org.jgrapht.graph.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Network of Routers represented by Simple Weighted Graph
@@ -97,13 +100,60 @@ class Network {
 
         if (cost == Double.POSITIVE_INFINITY) {
             for (Router router : network.vertexSet()) {
+                // Cost to go from R1 to every other router in the network VIA R2 is now infinity
                 R1.updateTable(router, R2, cost, numHops);
+                // Cost to go from R2 to every other router in the network VIA R1 is now infinity
                 R2.updateTable(router, R1, cost, numHops);
             }
         } else {
             R1.updateTable(R2, R2, cost, 1);
             R2.updateTable(R1, R1, cost, 1);
         }
+
+        // GOES HERE
+
+        /*
+         * r1_neighbors = network.getNeighbors( r1 )        *******network.getNeighbors(Router)
+         r2_neighbors = network.getNeighbors( r2 )
+
+         for neighbor in r1_neighbors.keys():
+         if neighbor == r2:
+         continue
+
+         neighbor_r2_cost = network.getEdgeCost( neighbor, r2 )      *****network.getLinkWeight(Router)
+         neighbor_r1_cost = network.getEdgeCost( neighbor, r1 )
+
+         if neighbor_r2_cost is not None:
+         new_cost = cost + neighbor_r2_cost if cost is not None else None
+         # print( '{}: to {} via {} -> {}'.format( neighbor, r1, r2, new_cost ) )
+         network.vertices[neighbor].setCostFromEvent( r1, r2, new_cost )
+         updates[neighbor] = True
+
+         if neighbor_r1_cost is not None:
+         new_cost = cost + neighbor_r1_cost if cost is not None else None
+         # print( '{}: to {} via {} -> {}'.format( neighbor, r2, r1, new_cost ) )
+         network.vertices[neighbor].setCostFromEvent( r2, r1, new_cost )      *****Router.updateCost(dest, via, cost)
+         updates[neighbor] = True
+
+         for neighbor in r2_neighbors.keys():
+         if neighbor == r1:
+         continue
+
+         neighbor_r2_cost = network.getEdgeCost( neighbor, r2 )
+         neighbor_r1_cost = network.getEdgeCost( neighbor, r1 )
+
+         if neighbor_r2_cost is not None:
+         new_cost = cost + neighbor_r2_cost if cost is not None else None
+         # print( '{}: to {} via {} -> {}'.format( neighbor, r1, r2, new_cost ) )
+         network.vertices[neighbor].setCostFromEvent( r1, r2, new_cost )
+         updates[neighbor] = True
+
+         if neighbor_r1_cost is not None:
+         new_cost = cost + neighbor_r1_cost if cost is not None else None
+         # print( '{}: to {} via {} -> {}'.format( neighbor, r2, r1, new_cost ) )
+         network.vertices[neighbor].setCostFromEvent( r2, r1, new_cost )
+         updates[neighbor] = True
+         */
 
     }
 
@@ -118,6 +168,27 @@ class Network {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns all neighboring routers
+     * @param router Router to fetch neighbors for
+     * @return Set of neighbors of supplied router
+     */
+    HashSet<Router> getNeighbors(Router router) {
+        Set<DefaultEdge> outgoingEdges = network.outgoingEdgesOf(router);
+        return outgoingEdges.stream().map(edge -> network.getEdgeTarget(edge))
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    /**
+     * Cost of link between 2 routers
+     * @param R1 Router 1
+     * @param R2 Router 2
+     * @return Link weight (double) between the 2 routers
+     */
+    double getLinkWeight(Router R1, Router R2) {
+        return network.getEdgeWeight(network.getEdge(R1, R2));
     }
 
     /**

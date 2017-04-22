@@ -2,27 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5d0a7476-f4d7-4408-8081-d7ea51d3120f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/Tuple.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ViaMap.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/PA3/RoutingVector$Tuple.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/PA3/RoutingVector.class" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/FileParser.class" afterPath="$PROJECT_DIR$/out/production/PA3/FileParser.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/Network.class" afterPath="$PROJECT_DIR$/out/production/PA3/Network.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/Router.class" afterPath="$PROJECT_DIR$/out/production/PA3/Router.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/RoutingTable.class" afterPath="$PROJECT_DIR$/out/production/PA3/RoutingTable.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/TopologicalEvent.class" afterPath="$PROJECT_DIR$/out/production/PA3/TopologicalEvent.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/VectorRoutingSim.class" afterPath="$PROJECT_DIR$/out/production/PA3/VectorRoutingSim.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/network.txt" afterPath="$PROJECT_DIR$/out/production/PA3/network.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/FileParser.java" afterPath="$PROJECT_DIR$/src/FileParser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/PA3/events.txt" afterPath="$PROJECT_DIR$/out/production/PA3/events.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Network.java" afterPath="$PROJECT_DIR$/src/Network.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Router.java" afterPath="$PROJECT_DIR$/src/Router.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/RoutingTable.java" afterPath="$PROJECT_DIR$/src/RoutingTable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/RoutingVector.java" afterPath="$PROJECT_DIR$/src/RoutingVector.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TopologicalEvent.java" afterPath="$PROJECT_DIR$/src/TopologicalEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/VectorRoutingSim.java" afterPath="$PROJECT_DIR$/src/VectorRoutingSim.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/events.txt" afterPath="$PROJECT_DIR$/src/events.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/network.txt" afterPath="$PROJECT_DIR$/src/network.txt" />
     </list>
     <ignored path="PA3.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -44,26 +28,28 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Network.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Network.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Network.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+            <state relative-caret-position="-718">
+              <caret line="115" column="71" selection-start-line="115" selection-start-column="71" selection-end-line="115" selection-end-column="71" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#Network#0;class#Network#0" expanded="false" />
                 <element signature="method#addRouter#0;class#Network#0" expanded="false" />
                 <element signature="method#addLink#0;class#Network#0" expanded="false" />
+                <element signature="e#6214#6215#0" expanded="true" />
+                <element signature="e#6283#6284#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Router.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Router.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Router.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="121" column="66" selection-start-line="121" selection-start-column="66" selection-end-line="121" selection-end-column="66" />
+            <state relative-caret-position="242">
+              <caret line="90" column="31" selection-start-line="90" selection-start-column="31" selection-end-line="90" selection-end-column="31" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -84,16 +70,16 @@
       <file leaf-file-name="RoutingTable.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/RoutingTable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="137">
-              <caret line="98" column="44" selection-start-line="98" selection-start-column="44" selection-end-line="98" selection-end-column="44" />
+            <state relative-caret-position="47">
+              <caret line="10" column="7" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#setCost#0;class#RoutingTable#0" expanded="false" />
                 <element signature="method#setNumHops#0;class#RoutingTable#0" expanded="false" />
-                <element signature="e#2204#2205#0" expanded="true" />
-                <element signature="e#2248#2249#0" expanded="true" />
-                <element signature="e#2300#2301#0" expanded="true" />
-                <element signature="e#2342#2343#0" expanded="true" />
+                <element signature="e#2356#2357#0" expanded="true" />
+                <element signature="e#2400#2401#0" expanded="true" />
+                <element signature="e#2452#2453#0" expanded="true" />
+                <element signature="e#2494#2495#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -102,8 +88,8 @@
       <file leaf-file-name="VectorRoutingSim.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/VectorRoutingSim.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+            <state relative-caret-position="105">
+              <caret line="40" column="27" selection-start-line="40" selection-start-column="27" selection-end-line="40" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#VectorRoutingSim#0;class#VectorRoutingSim#0" expanded="false" />
@@ -167,10 +153,10 @@
         <option value="$PROJECT_DIR$/src/RoutingVector.java" />
         <option value="$PROJECT_DIR$/src/FileParser.java" />
         <option value="$PROJECT_DIR$/src/events.txt" />
-        <option value="$PROJECT_DIR$/src/Network.java" />
         <option value="$PROJECT_DIR$/src/VectorRoutingSim.java" />
-        <option value="$PROJECT_DIR$/src/Router.java" />
         <option value="$PROJECT_DIR$/src/RoutingTable.java" />
+        <option value="$PROJECT_DIR$/src/Router.java" />
+        <option value="$PROJECT_DIR$/src/Network.java" />
       </list>
     </option>
   </component>
@@ -912,12 +898,20 @@
       <option name="presentableId" value="Default" />
       <updated>1492644338284</updated>
       <workItem from="1492644339637" duration="2276000" />
-      <workItem from="1492745493374" duration="38287000" />
+      <workItem from="1492745493374" duration="41009000" />
     </task>
+    <task id="LOCAL-00001" summary="Issue in updating network after event. Somewhere, the new cost of the link is not being properly conveyed, so other routers don't know the new cost.">
+      <created>1492869547620</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1492869547620</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40563000" />
+    <option name="totallyTimeSpent" value="43285000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="30" y="23" width="1250" height="709" extended-state="0" />
@@ -961,6 +955,10 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Issue in updating network after event. Somewhere, the new cost of the link is not being properly conveyed, so other routers don't know the new cost." />
+    <option name="LAST_COMMIT_MESSAGE" value="Issue in updating network after event. Somewhere, the new cost of the link is not being properly conveyed, so other routers don't know the new cost." />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -989,6 +987,8 @@
             <element signature="method#Network#0;class#Network#0" expanded="false" />
             <element signature="method#addRouter#0;class#Network#0" expanded="false" />
             <element signature="method#addLink#0;class#Network#0" expanded="false" />
+            <element signature="e#6214#6215#0" expanded="true" />
+            <element signature="e#6283#6284#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1011,10 +1011,10 @@
             <element signature="imports" expanded="true" />
             <element signature="method#setCost#0;class#RoutingTable#0" expanded="false" />
             <element signature="method#setNumHops#0;class#RoutingTable#0" expanded="false" />
-            <element signature="e#2204#2205#0" expanded="true" />
-            <element signature="e#2248#2249#0" expanded="true" />
-            <element signature="e#2300#2301#0" expanded="true" />
-            <element signature="e#2342#2343#0" expanded="true" />
+            <element signature="e#2356#2357#0" expanded="true" />
+            <element signature="e#2400#2401#0" expanded="true" />
+            <element signature="e#2452#2453#0" expanded="true" />
+            <element signature="e#2494#2495#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1144,39 +1144,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Network.java">
+    <entry file="file://$PROJECT_DIR$/src/FileParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+        <state relative-caret-position="600">
+          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#Network#0;class#Network#0" expanded="false" />
-            <element signature="method#addRouter#0;class#Network#0" expanded="false" />
-            <element signature="method#addLink#0;class#Network#0" expanded="false" />
+            <element signature="method#readTopologicalEvents#0;class#FileParser#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/RoutingTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="47">
+          <caret line="10" column="7" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#setCost#0;class#RoutingTable#0" expanded="false" />
+            <element signature="method#setNumHops#0;class#RoutingTable#0" expanded="false" />
+            <element signature="e#2356#2357#0" expanded="true" />
+            <element signature="e#2400#2401#0" expanded="true" />
+            <element signature="e#2452#2453#0" expanded="true" />
+            <element signature="e#2494#2495#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/VectorRoutingSim.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+        <state relative-caret-position="105">
+          <caret line="40" column="27" selection-start-line="40" selection-start-column="27" selection-end-line="40" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#VectorRoutingSim#0;class#VectorRoutingSim#0" expanded="false" />
             <element signature="method#splitHorizon#0;class#VectorRoutingSim#0" expanded="false" />
             <element signature="method#poisonReverse#0;class#VectorRoutingSim#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/FileParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#readTopologicalEvents#0;class#FileParser#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1189,28 +1192,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/RoutingTable.java">
+    <entry file="file://$PROJECT_DIR$/src/Router.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="98" column="44" selection-start-line="98" selection-start-column="44" selection-end-line="98" selection-end-column="44" />
+        <state relative-caret-position="242">
+          <caret line="90" column="31" selection-start-line="90" selection-start-column="31" selection-end-line="90" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#setCost#0;class#RoutingTable#0" expanded="false" />
-            <element signature="method#setNumHops#0;class#RoutingTable#0" expanded="false" />
-            <element signature="e#2204#2205#0" expanded="true" />
-            <element signature="e#2248#2249#0" expanded="true" />
-            <element signature="e#2300#2301#0" expanded="true" />
-            <element signature="e#2342#2343#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Router.java">
+    <entry file="file://$PROJECT_DIR$/src/Network.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="121" column="66" selection-start-line="121" selection-start-column="66" selection-end-line="121" selection-end-column="66" />
+        <state relative-caret-position="-718">
+          <caret line="115" column="71" selection-start-line="115" selection-start-column="71" selection-end-line="115" selection-end-column="71" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#Network#0;class#Network#0" expanded="false" />
+            <element signature="method#addRouter#0;class#Network#0" expanded="false" />
+            <element signature="method#addLink#0;class#Network#0" expanded="false" />
+            <element signature="e#6214#6215#0" expanded="true" />
+            <element signature="e#6283#6284#0" expanded="true" />
           </folding>
         </state>
       </provider>

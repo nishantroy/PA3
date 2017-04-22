@@ -8,8 +8,14 @@ import java.util.PriorityQueue;
 class RoutingTable {
 
 
+    /**
+     * All possible paths to a router
+     */
     private HashMap<Router, ViaMap> table;
 
+    /**
+     * To get to some router, which one of my neighbors gives me the fastest path
+     */
     private HashMap<Router, Router> fastestPath;
 
     RoutingTable() {

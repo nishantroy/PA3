@@ -85,6 +85,25 @@ class Router {
     }
 
     /**
+     * Updates cost for link
+     * @param dest Target router
+     * @param via Router through which we are going
+     * @param cost Cost of link
+     */
+    void updateCost(Router dest, Router via, double cost) {
+        if (getRouterID() == dest.getRouterID()) {
+            return;
+        }
+
+        this.routingTable.setCost(dest, via, cost);
+        Router fastestVia = routingTable.getFastestPath(dest);
+        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
+            routingTable.setFastestPath(dest, via);
+        }
+        setChanged(true);
+    }
+
+    /**
      * Receives routing table from neighbor, updates routing table accordingly.
      * TODO: NOT WORKING PROPERLY AFTER EVENT OCCURS IT SEEMS
      * @param broadcaster Router broadcasting its routing table
@@ -108,6 +127,7 @@ class Router {
             // Get broadcast viaMap
             ViaMap receivedViaMap = broadcast.get(dest);
             HashMap<Router, Tuple> viaVector = receivedViaMap.getMap();
+
             ViaMap myViaMap = getRoutingTable().getTable().get(dest);
 
             for (Router via : viaVector.keySet()) {
