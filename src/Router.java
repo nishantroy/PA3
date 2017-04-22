@@ -117,6 +117,7 @@ class Router {
         RoutingTable broadcasterRoutingTable = broadcaster.getRoutingTable();
         HashMap<Router, ViaMap> broadcast = broadcasterRoutingTable.getTable();
 
+
         // Get cost and number of hops to broadcaster
         Router fastestVia = routingTable.getFastestPath(broadcaster);
         double costToBroadcaster = routingTable.getCost(broadcaster, fastestVia);
