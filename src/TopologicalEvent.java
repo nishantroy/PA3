@@ -1,22 +1,25 @@
 import org.jgrapht.alg.flow.PadbergRaoOddMinimumCutset;
 
 /**
- * Topological Events for Network
+ * Topological Events for Network.
+ * - Round in which event occurs
+ * - Routers affected
+ * - New cost of link. (-1 means link removed)
  */
 public class TopologicalEvent implements Comparable<TopologicalEvent> {
     private int round;
     private int sourceRouterID;
     private int destRouterID;
-    private int cost;
+    private double cost;
 
-    TopologicalEvent(int round, int sourceRouterID, int destRouterID, int cost) {
+    TopologicalEvent(int round, int sourceRouterID, int destRouterID, double cost) {
         this.round = round;
         this.sourceRouterID = sourceRouterID;
         this.destRouterID = destRouterID;
         this.cost = cost;
     }
 
-    private int getRound() {
+    public int getRound() {
         return round;
     }
 
@@ -28,7 +31,7 @@ public class TopologicalEvent implements Comparable<TopologicalEvent> {
         return destRouterID;
     }
 
-    public int getCost() {
+    public double getCost() {
         return cost;
     }
 
@@ -41,5 +44,11 @@ public class TopologicalEvent implements Comparable<TopologicalEvent> {
         } else {
             return 1;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "At round #" + round + ", a link between " + sourceRouterID + " and "
+                + destRouterID + " will be added, with a cost of " + cost;
     }
 }
