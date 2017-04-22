@@ -80,7 +80,6 @@ class Network {
 
     /**
      * Executes a topological event. Adds/Removes links as necessary, and changes all the routing tables.
-     * TODO: CAUSING SOME ISSUE! INFINITE LOOP WHEN EVENT IS RUN!
      * @param event Event to execute
      */
     void executeEvent (TopologicalEvent event) {
@@ -132,6 +131,7 @@ class Network {
                     costUpdate = Double.POSITIVE_INFINITY;
                 }
                 neighbor.updateCost(R1, R2, costUpdate);
+                R1.updateCost(neighbor, R2, costUpdate);
                 neighbor.setChanged(true);
 
 
@@ -145,6 +145,7 @@ class Network {
                     costUpdate = Double.POSITIVE_INFINITY;
                 }
                 neighbor.updateCost(R2, R1, costUpdate);
+                R2.updateCost(neighbor, R1, costUpdate);
                 neighbor.setChanged(true);
                 //if(neighbor.equals(R1)) neighbor.setChanged(false);
             }
@@ -166,6 +167,7 @@ class Network {
                     costUpdate = Double.POSITIVE_INFINITY;
                 }
                 neighbor.updateCost(R1, R2, costUpdate);
+                R1.updateCost(neighbor, R2, costUpdate);
                 neighbor.setChanged(true);
 
             }
@@ -178,6 +180,7 @@ class Network {
                     costUpdate = Double.POSITIVE_INFINITY;
                 }
                 neighbor.updateCost(R2, R1, costUpdate);
+                R2.updateCost(neighbor, R1, costUpdate);
                 neighbor.setChanged(true);
 
             }

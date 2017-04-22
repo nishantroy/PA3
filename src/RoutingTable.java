@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.PriorityQueue;
 
 /**
  * Routing Table for each Router
@@ -88,7 +87,6 @@ class RoutingTable {
 
     }
 
-
     Router getFastestPath(Router dest) {
         return fastestPath.get(dest);
     }
@@ -97,6 +95,25 @@ class RoutingTable {
         fastestPath.put(dest, via);
     }
 
+    void updateAllFastestPaths() {
+        for (Router dest : table.keySet()) {
+            HashMap<Router, Tuple> map = table.get(dest).getMap();
+            Router currFastest = null;
+            for (Router via : map.keySet()) {
+                if (currFastest == null) {
+                    currFastest = via;
+                } else {
+                    Tuple info = map.get(via);
+                    double cost = info.getCost();
+                    double currCost = getCost(dest, currFastest);
+                    if (cost < currCost) {
+                        currFastest = via;
+                    }
+                }
+            }
+            fastestPath.put(dest, currFastest);
+        }
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

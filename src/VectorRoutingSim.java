@@ -71,6 +71,10 @@ public class VectorRoutingSim {
             if (!events.isEmpty()) {
                 notConverged = true;
             }
+
+            for (Router router : network.getNetwork().vertexSet()) {
+                router.getRoutingTable().updateAllFastestPaths();
+            }
         }
 
         // Print results
