@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.concurrent.atomic.DoubleAccumulator;
 import java.util.stream.Collectors;
 
 /**
@@ -204,12 +205,17 @@ class Network {
      * @return Set of neighbors of supplied router
      */
     HashSet<Router> getNeighbors(Router router) {
-        Set<DefaultEdge> outgoingEdges = network.outgoingEdgesOf(router);
+        Set<DefaultEdge> outgoingEdges = network.edgesOf(router);
         HashSet<Router> neighbors = new HashSet<>();
         for (DefaultEdge edge : outgoingEdges) {
             Router R2 = network.getEdgeTarget(edge);
+            Router R1 = network.getEdgeSource(edge);
             if (!R2.equals(router)) {
                 neighbors.add(R2);
+            }
+
+            if (!R1.equals(router)) {
+                neighbors.add(R1);
             }
         }
 //        return outgoingEdges.stream().map(edge -> network.getEdgeTarget(edge))
@@ -227,7 +233,7 @@ class Network {
         try {
             return network.getEdgeWeight(network.getEdge(R1, R2));
         } catch (Exception e) {
-            return network.getEdgeWeight(network.getEdge(R2, R1));
+            return Double.POSITIVE_INFINITY;
         }
     }
 
