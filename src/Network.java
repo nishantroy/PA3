@@ -3,6 +3,7 @@ import org.jgrapht.graph.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +89,7 @@ class Network {
         double numHops = 1;
         if (cost == -1) {
             cost = Double.POSITIVE_INFINITY;
-            numHops = cost;
+            numHops = Double.POSITIVE_INFINITY;
         }
         addRouter(R1);
         addRouter(R2);
@@ -110,50 +111,77 @@ class Network {
             R2.updateTable(R1, R1, cost, 1);
         }
 
-        // GOES HERE
+        HashSet<Router> r1Neigbors = getNeighbors(R1);
+        HashSet<Router> r2Neigbors = getNeighbors(R2);
 
-        /*
-         * r1_neighbors = network.getNeighbors( r1 )        *******network.getNeighbors(Router)
-         r2_neighbors = network.getNeighbors( r2 )
+        for (Router neighbor : r1Neigbors) {
+//            if (neighbor.equals(R2) || neighbor.equals(R1)) continue;
+            if (neighbor.equals(R2)) continue;
 
-         for neighbor in r1_neighbors.keys():
-         if neighbor == r2:
-         continue
 
-         neighbor_r2_cost = network.getEdgeCost( neighbor, r2 )      *****network.getLinkWeight(Router)
-         neighbor_r1_cost = network.getEdgeCost( neighbor, r1 )
+            double costNeighborToR2 = getLinkWeight(neighbor, R2);
+//            double costNeighborToR1 = neighbor.equals(R1) ? 0 : getLinkWeight(neighbor, R1);
+            double costNeighborToR1 = getLinkWeight(neighbor, R1);
 
-         if neighbor_r2_cost is not None:
-         new_cost = cost + neighbor_r2_cost if cost is not None else None
-         # print( '{}: to {} via {} -> {}'.format( neighbor, r1, r2, new_cost ) )
-         network.vertices[neighbor].setCostFromEvent( r1, r2, new_cost )
-         updates[neighbor] = True
+            if (costNeighborToR2 != Double.POSITIVE_INFINITY ) {
+                double costUpdate;
+                if (cost != Double.POSITIVE_INFINITY) {
+                    costUpdate = cost + costNeighborToR2;
+                } else {
+                    costUpdate = Double.POSITIVE_INFINITY;
+                }
+                neighbor.updateCost(R1, R2, costUpdate);
+                neighbor.setChanged(true);
 
-         if neighbor_r1_cost is not None:
-         new_cost = cost + neighbor_r1_cost if cost is not None else None
-         # print( '{}: to {} via {} -> {}'.format( neighbor, r2, r1, new_cost ) )
-         network.vertices[neighbor].setCostFromEvent( r2, r1, new_cost )      *****Router.updateCost(dest, via, cost)
-         updates[neighbor] = True
 
-         for neighbor in r2_neighbors.keys():
-         if neighbor == r1:
-         continue
+            }
 
-         neighbor_r2_cost = network.getEdgeCost( neighbor, r2 )
-         neighbor_r1_cost = network.getEdgeCost( neighbor, r1 )
+            if (costNeighborToR1 != Double.POSITIVE_INFINITY ) {
+                double costUpdate;
+                if (cost != Double.POSITIVE_INFINITY) {
+                    costUpdate = cost + costNeighborToR1;
+                } else {
+                    costUpdate = Double.POSITIVE_INFINITY;
+                }
+                neighbor.updateCost(R2, R1, costUpdate);
+                neighbor.setChanged(true);
+                //if(neighbor.equals(R1)) neighbor.setChanged(false);
+            }
 
-         if neighbor_r2_cost is not None:
-         new_cost = cost + neighbor_r2_cost if cost is not None else None
-         # print( '{}: to {} via {} -> {}'.format( neighbor, r1, r2, new_cost ) )
-         network.vertices[neighbor].setCostFromEvent( r1, r2, new_cost )
-         updates[neighbor] = True
+        }
 
-         if neighbor_r1_cost is not None:
-         new_cost = cost + neighbor_r1_cost if cost is not None else None
-         # print( '{}: to {} via {} -> {}'.format( neighbor, r2, r1, new_cost ) )
-         network.vertices[neighbor].setCostFromEvent( r2, r1, new_cost )
-         updates[neighbor] = True
-         */
+        for (Router neighbor : r2Neigbors) {
+//            if (neighbor.equals(R1) || neighbor.equals(R2)) continue;
+            if (neighbor.equals(R1)) continue;
+
+            double costNeighborToR1 = getLinkWeight(neighbor, R1);
+            double costNeighborToR2 = getLinkWeight(neighbor, R2);
+
+            if (costNeighborToR2 != Double.POSITIVE_INFINITY) {
+                double costUpdate;
+                if (cost != Double.POSITIVE_INFINITY) {
+                    costUpdate = cost + costNeighborToR2;
+                } else {
+                    costUpdate = Double.POSITIVE_INFINITY;
+                }
+                neighbor.updateCost(R1, R2, costUpdate);
+                neighbor.setChanged(true);
+
+            }
+
+            if (costNeighborToR1 != Double.POSITIVE_INFINITY) {
+                double costUpdate;
+                if (cost != Double.POSITIVE_INFINITY) {
+                    costUpdate = cost + costNeighborToR1;
+                } else {
+                    costUpdate = Double.POSITIVE_INFINITY;
+                }
+                neighbor.updateCost(R2, R1, costUpdate);
+                neighbor.setChanged(true);
+
+            }
+
+        }
 
     }
 
@@ -177,8 +205,16 @@ class Network {
      */
     HashSet<Router> getNeighbors(Router router) {
         Set<DefaultEdge> outgoingEdges = network.outgoingEdgesOf(router);
-        return outgoingEdges.stream().map(edge -> network.getEdgeTarget(edge))
-                .collect(Collectors.toCollection(HashSet::new));
+        HashSet<Router> neighbors = new HashSet<>();
+        for (DefaultEdge edge : outgoingEdges) {
+            Router R2 = network.getEdgeTarget(edge);
+            if (!R2.equals(router)) {
+                neighbors.add(R2);
+            }
+        }
+//        return outgoingEdges.stream().map(edge -> network.getEdgeTarget(edge))
+//                .collect(Collectors.toCollection(HashSet::new));
+        return neighbors;
     }
 
     /**
@@ -188,7 +224,11 @@ class Network {
      * @return Link weight (double) between the 2 routers
      */
     double getLinkWeight(Router R1, Router R2) {
-        return network.getEdgeWeight(network.getEdge(R1, R2));
+        try {
+            return network.getEdgeWeight(network.getEdge(R1, R2));
+        } catch (Exception e) {
+            return network.getEdgeWeight(network.getEdge(R2, R1));
+        }
     }
 
     /**
