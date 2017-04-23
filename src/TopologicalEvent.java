@@ -1,10 +1,12 @@
+import java.io.Serializable;
+
 /**
  * Topological Events for Network.
  * - Round in which event occurs
  * - Routers affected
  * - New cost of link. (-1 means link removed)
  */
-public class TopologicalEvent implements Comparable<TopologicalEvent> {
+public class TopologicalEvent implements Comparable<TopologicalEvent>, Serializable {
     private int round;
     private int sourceRouterID;
     private int destRouterID;

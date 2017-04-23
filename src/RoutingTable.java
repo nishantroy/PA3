@@ -63,7 +63,7 @@ class RoutingTable implements Serializable {
      * @param via Router via which we're looking for a path
      * @return True if path exists
      */
-    boolean hasEntry(Router dest, Router via) {
+    private boolean hasEntry(Router dest, Router via) {
         return table.get(dest).hasEntry(via);
     }
 

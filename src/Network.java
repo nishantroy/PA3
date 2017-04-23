@@ -1,16 +1,14 @@
 import org.jgrapht.graph.*;
 
-import java.util.HashMap;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Iterator;
-import java.util.concurrent.atomic.DoubleAccumulator;
-import java.util.stream.Collectors;
+
 
 /**
  * Network of Routers represented by Simple Weighted Graph
  */
-class Network {
+class Network implements Serializable{
     private SimpleWeightedGraph<Router, DefaultEdge> network;
 
     Network() {
@@ -21,7 +19,6 @@ class Network {
     Network(Network network) {
 
         this.network = network.getNetwork();
-        //this.network = new SimpleWeightedGraph<Router, DefaultEdge>(network);
     }
 
     public SimpleWeightedGraph<Router, DefaultEdge> getNetwork() {
@@ -81,7 +78,7 @@ class Network {
     }
 
 
-    void updateNetworkGraph (HashSet<TopologicalEvent> events) {
+    private void updateNetworkGraph (HashSet<TopologicalEvent> events) {
         for(TopologicalEvent event : events) {
             Double cost = event.getCost();
             if (cost == -1) {
@@ -112,11 +109,10 @@ class Network {
             Router R1 = new Router(event.getSourceRouterID());
             Router R2 = new Router(event.getDestRouterID());
             double cost = event.getCost();
-            //double numHops = 1;
             if (cost == -1) {
                 cost = Double.POSITIVE_INFINITY;
-               // numHops = Double.POSITIVE_INFINITY;
             }
+
             addRouter(R1);
             addRouter(R2);
             addLink(R1, R2);
@@ -157,7 +153,6 @@ class Network {
                         costUpdate = Double.POSITIVE_INFINITY;
                     }
                     neighbor.updateCost(R1, R2, costUpdate);
-                    //R1.updateCost(neighbor, R2, costUpdate);
                     neighbor.setChanged(true);
                 }
 
@@ -169,15 +164,12 @@ class Network {
                         costUpdate = Double.POSITIVE_INFINITY;
                     }
                     neighbor.updateCost(R2, R1, costUpdate);
-                    //R2.updateCost(neighbor, R1, costUpdate);
                     neighbor.setChanged(true);
-                    //if(neighbor.equals(R1)) neighbor.setChanged(false);
                 }
 
             }
 
                 for (Router neighbor : r2Neigbors) {
-    //            if (neighbor.equals(R1) || neighbor.equals(R2)) continue;
                     if (neighbor.equals(R1)) continue;
 
                     double costNeighborToR1 = getLinkWeight(neighbor, R1);
@@ -191,7 +183,6 @@ class Network {
                             costUpdate = Double.POSITIVE_INFINITY;
                         }
                         neighbor.updateCost(R1, R2, costUpdate);
-                        //R1.updateCost(neighbor, R2, costUpdate);
                         neighbor.setChanged(true);
 
                     }
@@ -204,7 +195,6 @@ class Network {
                             costUpdate = Double.POSITIVE_INFINITY;
                         }
                         neighbor.updateCost(R2, R1, costUpdate);
-                        //R2.updateCost(neighbor, R1, costUpdate);
                         neighbor.setChanged(true);
 
                     }
@@ -213,18 +203,18 @@ class Network {
             }
     }
 
-    /**
-     * Checks if no router was changed
-     * @return True if protocol converged
-     */
-    boolean isConverged() {
-        for (Router router : network.vertexSet()) {
-            if (router.isChanged()) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    /**
+//     * Checks if no router was changed
+//     * @return True if protocol converged
+//     */
+//    boolean isConverged() {
+//        for (Router router : network.vertexSet()) {
+//            if (router.isChanged()) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     /**
      * Returns all neighboring routers
@@ -245,8 +235,6 @@ class Network {
                 neighbors.add(R1);
             }
         }
-//        return outgoingEdges.stream().map(edge -> network.getEdgeTarget(edge))
-//                .collect(Collectors.toCollection(HashSet::new));
         return neighbors;
     }
 
@@ -256,7 +244,7 @@ class Network {
      * @param R2 Router 2
      * @return Link weight (double) between the 2 routers
      */
-    double getLinkWeight(Router R1, Router R2) {
+    private double getLinkWeight(Router R1, Router R2) {
         try {
             return network.getEdgeWeight(network.getEdge(R1, R2));
         } catch (Exception e) {
@@ -264,38 +252,38 @@ class Network {
         }
     }
 
-    /**
-     * Prints out the routing vectors (shortest paths) for all routers
-     */
-    void printRoutingVectors() {
-        StringBuilder sb = new StringBuilder();
-        for (Router router : network.vertexSet()) {
-//            sb.append(router.getVectorPrint());
-        }
-        System.out.println(sb.toString());
-    }
+//    /**
+//     * Prints out the routing vectors (shortest paths) for all routers
+//     */
+//    void printRoutingVectors() {
+//        StringBuilder sb = new StringBuilder();
+//        for (Router router : network.vertexSet()) {
+////            sb.append(router.getVectorPrint());
+//        }
+//        System.out.println(sb.toString());
+//    }
 
-    /**
-     * Prints out the whole routing tables (path from R1 to R2 via RX) for all routers
-     */
-    void printRoutingTables() {
-        StringBuilder sb = new StringBuilder();
-        for (Router router : network.vertexSet()) {
-            sb.append("TABLE FOR ROUTER #" + router + "\n\n");
-            sb.append(router.getRoutingTable().toString());
-        }
-        System.out.println(sb.toString());
-    }
+//    /**
+//     * Prints out the whole routing tables (path from R1 to R2 via RX) for all routers
+//     */
+//    void printRoutingTables() {
+//        StringBuilder sb = new StringBuilder();
+//        for (Router router : network.vertexSet()) {
+//            sb.append("TABLE FOR ROUTER #" + router + "\n\n");
+//            sb.append(router.getRoutingTable().toString());
+//        }
+//        System.out.println(sb.toString());
+//    }
 
-    void printFastestPaths() {
-        StringBuilder sb = new StringBuilder();
-        for (Router router : network.vertexSet()) {
-            sb.append("\nFastest path from " + router + ":\n");
-            sb.append(router.getRoutingTable().printFastestPath());
-
-        }
-        System.out.println(sb.toString());
-    }
+//    void printFastestPaths() {
+//        StringBuilder sb = new StringBuilder();
+//        for (Router router : network.vertexSet()) {
+//            sb.append("\nFastest path from " + router + ":\n");
+//            sb.append(router.getRoutingTable().printFastestPath());
+//
+//        }
+//        System.out.println(sb.toString());
+//    }
 
     @Override
     public String toString() {

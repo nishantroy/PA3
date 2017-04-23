@@ -108,14 +108,123 @@ public class VectorRoutingSim {
     }
 
 
-    private void splitHorizon(int flag) {
-        Network network = this.network;
-        PriorityQueue<TopologicalEvent> events = this.events;
+    private boolean splitHorizon() {
+        Boolean updated = false;
+        Set<Router> routers = network.getNetwork().vertexSet();
+        //Set<Router> routersCopy = new HashSet<>();
+        HashMap<Router, RoutingTable> copiedRoutersTables = new HashMap<>();
+        for (Router router : routers) {
+            Router routerCopy = (Router) deepClone(router);
+            copiedRoutersTables.put(router, routerCopy.getRoutingTable());
+            //routersCopy.add((Router)deepClone(router));
+        }
+
+        for (Router router : routers) {
+            if (!router.isChanged()) continue;
+            HashSet<Router> neighbors = network.getNeighbors(router);
+            RoutingTable routerRTable = router.getRoutingTable();
+
+            for (Router neighbor : neighbors) {
+
+                for (Map.Entry<Router, ViaMap> entry : routerRTable.getTable().entrySet()) {
+                    Router dest = entry.getKey();
+                    if (dest.equals(router)) continue;
+
+                    if (routerRTable.getFastestPath(dest) != null) {
+                        Router via = routerRTable.getFastestPath(dest);
+                        double oldCost = copiedRoutersTables.get(router).getCost(dest, via);
+                        if (oldCost != Double.POSITIVE_INFINITY) {
+                            RoutingTable neighborRTable = neighbor.getRoutingTable();
+                            double extraCost = neighborRTable.getCost(router, router);
+                            if(!routerRTable.getFastestPath(dest).equals(neighbor)){
+                                double updatedCost = oldCost + extraCost;
+                                boolean changed = neighborRTable.setCost(dest, router, updatedCost);
+                                if (changed) {
+                                    double count = copiedRoutersTables.get(router).getNumHops(dest, via) + 1;
+                                    neighborRTable.setNumHops(dest, router, count);
+                                    neighbor.setChanged(true);
+                                }
+                                if (!updated && changed) {
+                                    updated = true;
+                                }
+                            }
+
+
+                        }
+
+
+//                    } else {
+//                        routerRTable.setFastestPath();
+//                    }
+                    }
+
+                }
+            }
+
+        }
+        return updated;
     }
 
-    private void poisonReverse(int flag) {
-        Network network = this.network;
-        PriorityQueue<TopologicalEvent> events = this.events;
+    private boolean poisonReverse() {
+        Boolean updated = false;
+        Set<Router> routers = network.getNetwork().vertexSet();
+        //Set<Router> routersCopy = new HashSet<>();
+        HashMap<Router, RoutingTable> copiedRoutersTables = new HashMap<>();
+        for (Router router : routers) {
+            Router routerCopy = (Router) deepClone(router);
+            copiedRoutersTables.put(router, routerCopy.getRoutingTable());
+            //routersCopy.add((Router)deepClone(router));
+        }
+
+        for (Router router : routers) {
+            if (!router.isChanged()) continue;
+            HashSet<Router> neighbors = network.getNeighbors(router);
+            RoutingTable routerRTable = router.getRoutingTable();
+
+            for (Router neighbor : neighbors) {
+
+                for (Map.Entry<Router, ViaMap> entry : routerRTable.getTable().entrySet()) {
+                    Router dest = entry.getKey();
+                    if (dest.equals(router)) continue;
+
+                    if (routerRTable.getFastestPath(dest) != null) {
+                        Router via = routerRTable.getFastestPath(dest);
+                        double oldCost = copiedRoutersTables.get(router).getCost(dest, via);
+                        if (oldCost != Double.POSITIVE_INFINITY) {
+                            RoutingTable neighborRTable = neighbor.getRoutingTable();
+                            double extraCost = neighborRTable.getCost(router, router);
+                            double updatedCost;
+                            if(!routerRTable.getFastestPath(dest).equals(neighbor)){
+                                updatedCost = oldCost + extraCost;
+                            } else {
+                                updatedCost = Double.POSITIVE_INFINITY;
+                            }
+
+                            boolean changed = neighborRTable.setCost(dest, router, updatedCost);
+                            if (changed) {
+                                double count = copiedRoutersTables.get(router).getNumHops(dest, via) + 1;
+                                neighborRTable.setNumHops(dest, router, count);
+                                neighbor.setChanged(true);
+                            }
+                            if (!updated && changed) {
+                                updated = true;
+                            }
+
+
+
+                        }
+
+
+//                    } else {
+//                        routerRTable.setFastestPath();
+//                    }
+                    }
+
+                }
+            }
+
+        }
+        return updated;
     }
 
     private HashSet<TopologicalEvent> getEventsByRound(int roundNumber) {
@@ -165,13 +274,13 @@ public class VectorRoutingSim {
     private String createPrintable(HashMap<Router, HashMap<Router, outputTuple>> table) {
         StringBuilder sb = new StringBuilder();
         for (Router source : table.keySet()) {
-            sb.append("SRC: " + source.getRouterID()).append(" ");
+            sb.append("SRC: ").append(source.getRouterID()).append(" ");
             HashMap<Router, outputTuple> map = table.get(source);
             for (Router dest : map.keySet()) {
                 outputTuple tuple = map.get(dest);
                 Router via = tuple.getVia();
                 double numberOfHops = tuple.getNumberOfHops();
-                sb.append("TO: " + dest.getRouterID() + " VIA: " + via.getRouterID()  ).append(",").append(numberOfHops).append(" ");
+                sb.append("TO: ").append(dest.getRouterID()).append(" VIA: ").append(via.getRouterID()).append(",").append(numberOfHops).append(" ");
             }
             sb.append("\n");
         }
@@ -213,9 +322,15 @@ public class VectorRoutingSim {
 
         for (String algorithm : routingAlgorithms) {
             System.out.println("ALGORITHM: " + algorithm);
-            Network network = new Network(originalNetwork);
-            PriorityQueue<TopologicalEvent> events = new PriorityQueue<>(originalEvents);
+            Network networkCopy = (Network)deepClone(originalNetwork);
+            Network network = new Network(networkCopy);
+            //Network network = new Network(originalNetwork);
+            PriorityQueue<TopologicalEvent> eventsCopy = (PriorityQueue<TopologicalEvent>)deepClone(originalEvents);
+            //PriorityQueue<TopologicalEvent> events = new PriorityQueue<>(originalEvents);
+            PriorityQueue<TopologicalEvent> events = new PriorityQueue<>(eventsCopy);
+
             VectorRoutingSim simulator = new VectorRoutingSim(network, events);
+
 
             int roundNumber = 1;
             int lastEvent = 0;
@@ -240,10 +355,10 @@ public class VectorRoutingSim {
                         updated = simulator.regularRouting();
                         break;
                     case "Split Horizon":
-                        simulator.splitHorizon(0);
+                        updated = simulator.splitHorizon();
                         break;
                     case "Poison Reverse":
-                        simulator.poisonReverse(0);
+                        simulator.poisonReverse();
                         break;
                 }
 
@@ -269,7 +384,7 @@ public class VectorRoutingSim {
                     System.out.println("Count to infinity problem reached");
                     System.exit(1);
                 }
-
+                System.out.println(roundNumber);
                 roundNumber++;
             }
             if (flag == 0) {
