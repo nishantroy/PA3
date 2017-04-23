@@ -1,9 +1,8 @@
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.io.File;
-import java.util.PriorityQueue;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 /**
  * Vector Routing Simulation
@@ -20,67 +19,58 @@ public class VectorRoutingSim {
 
     /**
      * Basic Bellman-Ford Routing
-     * TODO: NOT WORKING AFTER EVENT OCCURS! LOOPS FOREVER
      *
-     * @param flag How to show output (look at pdf for details)
+     * @return something
      */
-    private void regularRouting(int flag) {
-        Network network = this.network;
-        SimpleWeightedGraph<Router, DefaultEdge> graph = network.getNetwork();
-        PriorityQueue<TopologicalEvent> events = this.events;
-
-        boolean notConverged = true;
-        int roundNumber = 0;
-        while (notConverged || !network.isConverged()) {
-            notConverged = false;
-            roundNumber++;
-            System.out.println("ROUND NUMBER: " + roundNumber);
-            // Execute events for current round
-            while (!events.isEmpty() && roundNumber == events.peek().getRound()) {
-                TopologicalEvent event = events.poll();
-                network.executeEvent(event);
-            }
-
-            for (DefaultEdge edge : graph.edgeSet()) {
-                Router R1 = graph.getEdgeSource(edge);
-                Router R2 = graph.getEdgeTarget(edge);
-                boolean R1changed = R1.isChanged();
-                boolean R2changed = R2.isChanged();
-
-
-                if (R1changed) {
-                    // Broadcast from source to destination
-                    if (R2.receiveBroadcast(R1)) {
-                        notConverged = true;
-                    }
-                }
-
-                if (R2changed) {
-                    // Broadcast from destination to source
-                    if (R1.receiveBroadcast(R2)) {
-                        notConverged = true;
-                    }
-                }
-            }
-
-            if (flag == 1) {
-                // Print results
-                network.printRoutingVectors();
-            }
-
-            if (!events.isEmpty()) {
-                notConverged = true;
-            }
-
-            for (Router router : network.getNetwork().vertexSet()) {
-                router.getRoutingTable().updateAllFastestPaths();
-            }
+    private boolean regularRouting() {
+        Boolean updated = false;
+        Set<Router> routers = network.getNetwork().vertexSet();
+        //Set<Router> routersCopy = new HashSet<>();
+        HashMap<Router, RoutingTable> copiedRoutersTables = new HashMap<>();
+        for (Router router: routers) {
+            Router routerCopy = (Router)deepClone(router);
+            copiedRoutersTables.put(router, routerCopy.getRoutingTable());
+            //routersCopy.add((Router)deepClone(router));
         }
 
-        // Print results
-        System.out.println("CONVERGED");
-//        network.printRoutingTables();
-        network.printFastestPaths();
+        for (Router router: routers) {
+            if(!router.isChanged()) continue;
+            HashSet<Router> neighbors = network.getNeighbors(router);
+            RoutingTable routerRTable = router.getRoutingTable();
+
+            for(Router neighbor:neighbors) {
+
+                for(Map.Entry<Router, ViaMap> entry : routerRTable.getTable().entrySet()) {
+                    Router dest = entry.getKey();
+                    if (dest.equals(router)) continue;
+
+                    if (routerRTable.getFastestPath(dest) != null) {
+                        Router via = routerRTable.getFastestPath(dest);
+                        double oldCost = copiedRoutersTables.get(router).getCost(dest, via);
+                        if (oldCost != Double.POSITIVE_INFINITY) {
+                            RoutingTable neighborRTable = neighbor.getRoutingTable();
+                            double extraCost = neighborRTable.getCost(router, router);
+                            if (!routerRTable.getFastestPath(dest).equals(neighbor)) {
+                                double updatedCost = oldCost + extraCost;
+                                boolean changed = neighborRTable.setCost(dest, router, updatedCost);
+                                if (changed) {
+                                    double count = copiedRoutersTables.get(router).getNumHops(dest, via) + 1;
+                                    neighborRTable.setNumHops(dest, router, count);
+                                    neighbor.setChanged(true);
+                                }
+                                if (!updated && changed) {
+                                    updated = true;
+                                }
+                            }
+                        }
+
+
+                    }
+                }
+
+            }
+        }
+        return updated;
 
     }
 
@@ -94,6 +84,29 @@ public class VectorRoutingSim {
         PriorityQueue<TopologicalEvent> events = this.events;
     }
 
+    private HashSet<TopologicalEvent> getEventsByRound(int roundNumber) {
+        HashSet<TopologicalEvent> roundEvents = new HashSet<>();
+        while (!events.isEmpty() && roundNumber == events.peek().getRound()) {
+            TopologicalEvent event = events.poll();
+            roundEvents.add(event);
+        }
+        return roundEvents;
+    }
+
+    public static Object deepClone(Object object) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(object);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return ois.readObject();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public static void main(String[] args) throws Exception {
 
@@ -119,19 +132,88 @@ public class VectorRoutingSim {
             PriorityQueue<TopologicalEvent> events = new PriorityQueue<>(originalEvents);
             VectorRoutingSim simulator = new VectorRoutingSim(network, events);
 
-            switch (algorithm) {
-                case "Regular":
-                    simulator.regularRouting(flag);
-                    break;
-                case "Split Horizon":
-                    simulator.splitHorizon(flag);
-                    break;
-                case "Poison Reverse":
-                    simulator.poisonReverse(flag);
-                    break;
+            int roundNumber = 1;
+            int lastEvent = 0;
+            Boolean updated = true;
+            StringBuilder sb = new StringBuilder();
+
+            if (flag == 1) {
+                double[][] table = makeTable(network, true);
+                sb.append("ROUND 1\n");
+                sb.append(printTable(table));
+                //do something with this
             }
 
+            while (true) {
+                HashSet<TopologicalEvent> eventsInRound = simulator.getEventsByRound(roundNumber);
+                if (!eventsInRound.isEmpty()) {
+                    network.executeEventsAndUpdate(eventsInRound);
+                    lastEvent = roundNumber;
+                }
+                switch (algorithm) {
+                    case "Regular":
+                        updated = simulator.regularRouting();
+                        break;
+                    case "Split Horizon":
+                        updated = simulator.splitHorizon();
+                        break;
+                    case "Poison Reverse":
+                        updated = simulator.poisonReverse();
+                        break;
+                }
+
+                Set<Router> routers = network.getNetwork().vertexSet();
+                for (Router router: routers) {
+                    router.setChanged(router.getRoutingTable().updateAllFastestPaths());
+                }
+                if(!updated && events.isEmpty()) {
+                    break;
+                }
+
+                double[][] table = makeTable(network);
+                if (flag == 1) {
+                    sb.append("Round " );
+                    sb.append(roundNumber);
+                    sb.append("\n");
+                    sb.append(printTable(table));
+                }
+
+                if (countToInf(table)) {
+                    System.out.println("Count to infinity problem reached");
+                    System.exit(1);
+                }
+
+                roundNumber++;
+            }
+            if (flag == 0) {
+                double[][] table = makeTable(network);
+                sb.append(printTable());
+            }
+            int convergenceDelay = roundNumber - lastEvent;
+            sb.append("Convergence delay: ");
+            sb.append(convergenceDelay);
+            sb.append(" round(s)");
+
+            StringBuilder filename = new StringBuilder();
+            filename.append("output-");
+            switch (algorithm) {
+                case "Regular":
+                    filename.append("basic");
+                    break;
+                case "Split Horizon":
+                    filename.append("split-horizon");
+                    break;
+                case "Poison Reverse":
+                    filename.append("split-horizon-poison-reverse");
+                    break;
+            }
+            if (flag == 1) {
+                filename.append("-detailed");
+            }
+            filename.append(".txt");
+            //NEED TO ADD FILE OUTPUT
+            System.out.println(sb.toString());
         }
 
-    }
+    }//PUT NEWLINE AT END OF PRINT TABLE
 }

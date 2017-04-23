@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -10,7 +11,7 @@ import java.util.PriorityQueue;
  * Used to determine whether or not to broadcast routing vector in next round.
  */
 
-class Router {
+class Router implements Serializable {
     private int routerID;
 //    private RoutingVector routingVector;
     private RoutingTable routingTable;
@@ -20,6 +21,12 @@ class Router {
         this.routerID = routerID;
 //        this.routingVector = new RoutingVector();
         this.routingTable = new RoutingTable();
+    }
+
+    Router(Router router) {
+        this.routerID = router.getRouterID();
+        this.routingTable = router.getRoutingTable();
+        this.changed = router.isChanged();
     }
 
     public int getRouterID() {
@@ -75,13 +82,17 @@ class Router {
         if (getRouterID() == dest.getRouterID()) {
             return;
         }
-        this.routingTable.setCost(dest, via, cost);
-        this.routingTable.setNumHops(dest, via, numHops);
-        Router fastestVia = routingTable.getFastestPath(dest);
-        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
-            routingTable.setFastestPath(dest, via);
-        }
-        setChanged(true);
+        updateCost(dest, via, cost);
+        routingTable.setNumHops(dest, via, numHops);
+
+
+//        this.routingTable.setCost(dest, via, cost);
+//        this.routingTable.setNumHops(dest, via, numHops);
+//        Router fastestVia = routingTable.getFastestPath(dest);
+//        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
+//            routingTable.setFastestPath(dest, via);
+//        }
+//        setChanged(true);
     }
 
     /**
@@ -95,12 +106,20 @@ class Router {
             return;
         }
 
-        this.routingTable.setCost(dest, via, cost);
-        Router fastestVia = routingTable.getFastestPath(dest);
-        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
-            routingTable.setFastestPath(dest, via);
+//        this.routingTable.setCost(dest, via, cost);
+//        Router fastestVia = routingTable.getFastestPath(dest);
+//        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
+//            routingTable.setFastestPath(dest, via);
+//        }
+//        setChanged(true);
+
+        ViaMap viaMap;
+        HashMap<Router, ViaMap> table = this.routingTable.getTable();
+        if (!table.containsKey(dest)) {
+            table.put(dest, new ViaMap());
         }
-        setChanged(true);
+        viaMap = table.get(dest);
+        viaMap.setCost(via, cost);
     }
 
     /**

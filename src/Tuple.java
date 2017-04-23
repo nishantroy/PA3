@@ -1,8 +1,10 @@
+import java.io.Serializable;
+
 /**
  * Tuple for Routing Table. Stores cost and # of hops to get to a certain router through a certain path.
  * Cost & # of hops may be (Double.POSITIVE_INFINITY) if link is down or no path has been found b/w routers.
  */
-class Tuple {
+class Tuple implements Serializable {
     private double cost;
     private double numberOfHops;
 

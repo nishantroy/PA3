@@ -78,115 +78,137 @@ class Network {
         return network.containsEdge(source, dest);
     }
 
+
+    void updateNetworkGraph (HashSet<TopologicalEvent> events) {
+        for(TopologicalEvent event : events) {
+            Double cost = event.getCost();
+            if (cost == -1) {
+                cost = Double.POSITIVE_INFINITY;
+            }
+            Router source = new Router(event.getSourceRouterID());
+            Router dest = new Router(event.getDestRouterID());
+
+            if (network.containsEdge(source, dest)) {
+                DefaultEdge edge = network.getEdge(source, dest);
+                source = network.getEdgeSource(edge);
+                dest = network.getEdgeTarget(edge);
+            }
+
+            network.addEdge(source, dest);
+            network.setEdgeWeight(network.getEdge(source, dest), cost);
+        }
+    }
+
     /**
-     * Executes a topological event. Adds/Removes links as necessary, and changes all the routing tables.
-     * @param event Event to execute
+     * Executes topological events. Adds/Removes links as necessary, and changes all the routing tables.
+     * @param events Event list to execute
      */
-    void executeEvent (TopologicalEvent event) {
-        Router R1 = new Router(event.getSourceRouterID());
-        Router R2 = new Router(event.getDestRouterID());
-        double cost = event.getCost();
-        double numHops = 1;
-        if (cost == -1) {
-            cost = Double.POSITIVE_INFINITY;
-            numHops = Double.POSITIVE_INFINITY;
-        }
-        addRouter(R1);
-        addRouter(R2);
-        addLink(R1, R2);
-        setLinkWeight(R1, R2, cost);
-        DefaultEdge edge = getNetwork().getEdge(R1, R2);
-        R1 = getNetwork().getEdgeSource(edge);
-        R2 = getNetwork().getEdgeTarget(edge);
+    void executeEventsAndUpdate (HashSet<TopologicalEvent> events) {
+        updateNetworkGraph(events);
 
-        if (cost == Double.POSITIVE_INFINITY) {
-            for (Router router : network.vertexSet()) {
-                // Cost to go from R1 to every other router in the network VIA R2 is now infinity
-                R1.updateTable(router, R2, cost, numHops);
-                // Cost to go from R2 to every other router in the network VIA R1 is now infinity
-                R2.updateTable(router, R1, cost, numHops);
+        for (TopologicalEvent event: events) {
+            Router R1 = new Router(event.getSourceRouterID());
+            Router R2 = new Router(event.getDestRouterID());
+            double cost = event.getCost();
+            //double numHops = 1;
+            if (cost == -1) {
+                cost = Double.POSITIVE_INFINITY;
+               // numHops = Double.POSITIVE_INFINITY;
             }
-        } else {
-            R1.updateTable(R2, R2, cost, 1);
-            R2.updateTable(R1, R1, cost, 1);
-        }
+            addRouter(R1);
+            addRouter(R2);
+            addLink(R1, R2);
+            setLinkWeight(R1, R2, cost);
+            DefaultEdge edge = getNetwork().getEdge(R1, R2);
+            R1 = getNetwork().getEdgeSource(edge);
+            R2 = getNetwork().getEdgeTarget(edge);
 
-        HashSet<Router> r1Neigbors = getNeighbors(R1);
-        HashSet<Router> r2Neigbors = getNeighbors(R2);
-
-        for (Router neighbor : r1Neigbors) {
-//            if (neighbor.equals(R2) || neighbor.equals(R1)) continue;
-            if (neighbor.equals(R2)) continue;
-
-
-            double costNeighborToR2 = getLinkWeight(neighbor, R2);
-//            double costNeighborToR1 = neighbor.equals(R1) ? 0 : getLinkWeight(neighbor, R1);
-            double costNeighborToR1 = getLinkWeight(neighbor, R1);
-
-            if (costNeighborToR2 != Double.POSITIVE_INFINITY ) {
-                double costUpdate;
-                if (cost != Double.POSITIVE_INFINITY) {
-                    costUpdate = cost + costNeighborToR2;
-                } else {
-                    costUpdate = Double.POSITIVE_INFINITY;
+            if (cost == Double.POSITIVE_INFINITY) {
+                for (Router router : network.vertexSet()) {
+                    // Cost to go from R1 to every other router in the network VIA R2 is now infinity
+                    R1.updateTable(router, R2, cost, Double.POSITIVE_INFINITY);
+                    // Cost to go from R2 to every other router in the network VIA R1 is now infinity
+                    R2.updateTable(router, R1, cost, Double.POSITIVE_INFINITY);
                 }
-                neighbor.updateCost(R1, R2, costUpdate);
-                R1.updateCost(neighbor, R2, costUpdate);
-                neighbor.setChanged(true);
-
-
+            } else {
+                R1.updateTable(R2, R2, cost, 1);
+                R2.updateTable(R1, R1, cost, 1);
             }
+            R1.setChanged(true);
+            R2.setChanged(true);
 
-            if (costNeighborToR1 != Double.POSITIVE_INFINITY ) {
-                double costUpdate;
-                if (cost != Double.POSITIVE_INFINITY) {
-                    costUpdate = cost + costNeighborToR1;
-                } else {
-                    costUpdate = Double.POSITIVE_INFINITY;
+            HashSet<Router> r1Neigbors = getNeighbors(R1);
+            HashSet<Router> r2Neigbors = getNeighbors(R2);
+
+            for (Router neighbor : r1Neigbors) {
+
+                if (neighbor.equals(R2)) continue;
+
+                double costNeighborToR2 = getLinkWeight(neighbor, R2);
+                double costNeighborToR1 = getLinkWeight(neighbor, R1);
+
+                if (costNeighborToR2 != Double.POSITIVE_INFINITY ) {
+                    double costUpdate;
+                    if (cost != Double.POSITIVE_INFINITY) {
+                        costUpdate = cost + costNeighborToR2;
+                    } else {
+                        costUpdate = Double.POSITIVE_INFINITY;
+                    }
+                    neighbor.updateCost(R1, R2, costUpdate);
+                    //R1.updateCost(neighbor, R2, costUpdate);
+                    neighbor.setChanged(true);
                 }
-                neighbor.updateCost(R2, R1, costUpdate);
-                R2.updateCost(neighbor, R1, costUpdate);
-                neighbor.setChanged(true);
-                //if(neighbor.equals(R1)) neighbor.setChanged(false);
-            }
 
-        }
-
-        for (Router neighbor : r2Neigbors) {
-//            if (neighbor.equals(R1) || neighbor.equals(R2)) continue;
-            if (neighbor.equals(R1)) continue;
-
-            double costNeighborToR1 = getLinkWeight(neighbor, R1);
-            double costNeighborToR2 = getLinkWeight(neighbor, R2);
-
-            if (costNeighborToR2 != Double.POSITIVE_INFINITY) {
-                double costUpdate;
-                if (cost != Double.POSITIVE_INFINITY) {
-                    costUpdate = cost + costNeighborToR2;
-                } else {
-                    costUpdate = Double.POSITIVE_INFINITY;
+                if (costNeighborToR1 != Double.POSITIVE_INFINITY ) {
+                    double costUpdate;
+                    if (cost != Double.POSITIVE_INFINITY) {
+                        costUpdate = cost + costNeighborToR1;
+                    } else {
+                        costUpdate = Double.POSITIVE_INFINITY;
+                    }
+                    neighbor.updateCost(R2, R1, costUpdate);
+                    //R2.updateCost(neighbor, R1, costUpdate);
+                    neighbor.setChanged(true);
+                    //if(neighbor.equals(R1)) neighbor.setChanged(false);
                 }
-                neighbor.updateCost(R1, R2, costUpdate);
-                R1.updateCost(neighbor, R2, costUpdate);
-                neighbor.setChanged(true);
 
             }
 
-            if (costNeighborToR1 != Double.POSITIVE_INFINITY) {
-                double costUpdate;
-                if (cost != Double.POSITIVE_INFINITY) {
-                    costUpdate = cost + costNeighborToR1;
-                } else {
-                    costUpdate = Double.POSITIVE_INFINITY;
+                for (Router neighbor : r2Neigbors) {
+    //            if (neighbor.equals(R1) || neighbor.equals(R2)) continue;
+                    if (neighbor.equals(R1)) continue;
+
+                    double costNeighborToR1 = getLinkWeight(neighbor, R1);
+                    double costNeighborToR2 = getLinkWeight(neighbor, R2);
+
+                    if (costNeighborToR2 != Double.POSITIVE_INFINITY) {
+                        double costUpdate;
+                        if (cost != Double.POSITIVE_INFINITY) {
+                            costUpdate = cost + costNeighborToR2;
+                        } else {
+                            costUpdate = Double.POSITIVE_INFINITY;
+                        }
+                        neighbor.updateCost(R1, R2, costUpdate);
+                        //R1.updateCost(neighbor, R2, costUpdate);
+                        neighbor.setChanged(true);
+
+                    }
+
+                    if (costNeighborToR1 != Double.POSITIVE_INFINITY) {
+                        double costUpdate;
+                        if (cost != Double.POSITIVE_INFINITY) {
+                            costUpdate = cost + costNeighborToR1;
+                        } else {
+                            costUpdate = Double.POSITIVE_INFINITY;
+                        }
+                        neighbor.updateCost(R2, R1, costUpdate);
+                        //R2.updateCost(neighbor, R1, costUpdate);
+                        neighbor.setChanged(true);
+
+                    }
+
                 }
-                neighbor.updateCost(R2, R1, costUpdate);
-                R2.updateCost(neighbor, R1, costUpdate);
-                neighbor.setChanged(true);
-
             }
-
-        }
-
     }
 
     /**

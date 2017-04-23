@@ -1,11 +1,11 @@
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Routing Table for each Router
  */
 
-class RoutingTable {
-
+class RoutingTable implements Serializable {
 
     /**
      * All possible paths to a router
@@ -17,13 +17,44 @@ class RoutingTable {
      */
     private HashMap<Router, Router> fastestPath;
 
-    RoutingTable() {
-        this.table = new HashMap<>();
-        this.fastestPath = new HashMap<>();
+    private HashMap<Router, Router> hops;
+    private Router router;
+
+    RoutingTable(int numberOfRouters, Router router) {
+        this.table = new HashMap<>(numberOfRouters);
+        this.fastestPath = new HashMap<>(numberOfRouters);
+        this.router = router;
+        this.hops = new HashMap<>(numberOfRouters);
     }
 
     HashMap<Router, ViaMap> getTable() {
         return table;
+    }
+
+    /**
+     * Set # of hops in path
+     * @param dest Destination router
+     * @param via Router we are going through
+     * @param numHops # of hops (double)
+     */
+    void setNumHops(Router dest, Router via, double numHops) {
+        ViaMap viaMap;
+        if (!table.containsKey(dest)) {
+            table.put(dest, new ViaMap());
+        }
+        viaMap = table.get(dest);
+        viaMap.setNumberOfHops(via, numHops);
+
+    }
+
+    /**
+     * # of hops in path
+     * @param dest Destination router
+     * @param via Router we are going through
+     * @return # of hops (double)
+     */
+    double getNumHops(Router dest, Router via) {
+        return table.get(dest).getNumberOfHops(via);
     }
 
     /**
@@ -43,8 +74,26 @@ class RoutingTable {
      * @return Cost of path to destination via another router (double)
      */
     double getCost(Router dest, Router via) {
-        return table.get(dest).getCost(via);
+        if (hasEntry(dest, via)) {
+            return table.get(dest).getCost(via);
+        }
+        return Double.POSITIVE_INFINITY;
     }
+
+//    /**
+//     * Sets cost
+//     * @param dest Destination to set cost for
+//     * @param via Router we are going through
+//     * @param cost Cost of path
+//     */
+//    void setCostForEvent(Router dest, Router via, double cost) {
+//        ViaMap viaMap;
+//        if (!table.containsKey(dest)) {
+//            table.put(dest, new ViaMap());
+//        }
+//        viaMap = table.get(dest);
+//        viaMap.setCost(via, cost);
+//    }
 
     /**
      * Sets cost
@@ -52,51 +101,52 @@ class RoutingTable {
      * @param via Router we are going through
      * @param cost Cost of path
      */
-    void setCost(Router dest, Router via, double cost) {
+    boolean setCost(Router dest, Router via, double cost) {
+
+        if (dest.equals(router) || via.equals(router)) return false;
+
         ViaMap viaMap;
         if (!table.containsKey(dest)) {
             table.put(dest, new ViaMap());
+            viaMap = table.get(dest);
+            viaMap.setCost(via, cost);
+            return true;
+        } else if (cost < getCost(dest, via) || fastestPath.get(dest) == via) {
+            viaMap = table.get(dest);
+            viaMap.setCost(via, cost);
+            return true;
         }
-        viaMap = table.get(dest);
-        viaMap.setCost(via, cost);
+
+        return false;
     }
 
-    /**
-     * # of hops in path
-     * @param dest Destination router
-     * @param via Router we are going through
-     * @return # of hops (double)
-     */
-    double getNumHops(Router dest, Router via) {
-        return table.get(dest).getNumberOfHops(via);
-    }
-
-    /**
-     * Set # of hops in path
-     * @param dest Destination router
-     * @param via Router we are going through
-     * @param numHops # of hops (double)
-     */
-    void setNumHops(Router dest, Router via, double numHops) {
-        ViaMap viaMap;
-        if (!table.containsKey(dest)) {
-            table.put(dest, new ViaMap());
-        }
-        viaMap = table.get(dest);
-        viaMap.setNumberOfHops(via, numHops);
-
+    void setHop(Router dest, Router via) {
+        hops.put(dest, via);
     }
 
     Router getFastestPath(Router dest) {
+
+        if (!fastestPath.containsKey(dest)) {
+            return null;
+        }
         return fastestPath.get(dest);
+
     }
 
     void setFastestPath(Router dest, Router via) {
         fastestPath.put(dest, via);
     }
 
-    void updateAllFastestPaths() {
+    /**
+    *TODO: fix this
+     */
+    boolean updateAllFastestPaths() {
+        boolean updated = false;
         for (Router dest : table.keySet()) {
+            if (!table.containsKey(dest)) {
+                fastestPath.put(dest, null);
+                hops.put(dest, null);
+            }
             HashMap<Router, Tuple> map = table.get(dest).getMap();
             Router currFastest = null;
             for (Router via : map.keySet()) {
@@ -111,9 +161,15 @@ class RoutingTable {
                     }
                 }
             }
-            fastestPath.put(dest, currFastest);
+            if (!fastestPath.get(dest).equals(currFastest)) {
+                updated = true;
+                fastestPath.put(dest, currFastest);
+            }
+
         }
+        return updated;
     }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
