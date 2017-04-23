@@ -19,7 +19,9 @@ class Network {
     }
 
     Network(Network network) {
+
         this.network = network.getNetwork();
+        //this.network = new SimpleWeightedGraph<Router, DefaultEdge>(network);
     }
 
     public SimpleWeightedGraph<Router, DefaultEdge> getNetwork() {

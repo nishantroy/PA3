@@ -57,20 +57,20 @@ public class VectorRoutingSim {
         Set<Router> routers = network.getNetwork().vertexSet();
         //Set<Router> routersCopy = new HashSet<>();
         HashMap<Router, RoutingTable> copiedRoutersTables = new HashMap<>();
-        for (Router router: routers) {
-            Router routerCopy = (Router)deepClone(router);
+        for (Router router : routers) {
+            Router routerCopy = (Router) deepClone(router);
             copiedRoutersTables.put(router, routerCopy.getRoutingTable());
             //routersCopy.add((Router)deepClone(router));
         }
 
-        for (Router router: routers) {
-            if(!router.isChanged()) continue;
+        for (Router router : routers) {
+            if (!router.isChanged()) continue;
             HashSet<Router> neighbors = network.getNeighbors(router);
             RoutingTable routerRTable = router.getRoutingTable();
 
-            for(Router neighbor:neighbors) {
+            for (Router neighbor : neighbors) {
 
-                for(Map.Entry<Router, ViaMap> entry : routerRTable.getTable().entrySet()) {
+                for (Map.Entry<Router, ViaMap> entry : routerRTable.getTable().entrySet()) {
                     Router dest = entry.getKey();
                     if (dest.equals(router)) continue;
 
@@ -95,14 +95,19 @@ public class VectorRoutingSim {
                         }
 
 
+//                    } else {
+//                        routerRTable.setFastestPath();
+//                    }
                     }
-                }
 
+                }
             }
+
         }
         return updated;
 
     }
+
 
     private void splitHorizon(int flag) {
         Network network = this.network;
@@ -150,8 +155,8 @@ public class VectorRoutingSim {
             map.put(router, new outputTuple(router, 0));
             for (Router dest : fastestPaths.keySet()) {
                 Router via = fastestPaths.get(dest);
-                double cost = router.getRoutingTable().getCost(dest, via);
-                map.put(dest, new outputTuple(via, cost));
+                double hops = router.getRoutingTable().getNumHops(dest, via);
+                map.put(dest, new outputTuple(via, hops));
             }
             out.put(router, map);
         }
@@ -161,13 +166,13 @@ public class VectorRoutingSim {
     private String createPrintable(HashMap<Router, HashMap<Router, outputTuple>> table) {
         StringBuilder sb = new StringBuilder();
         for (Router source : table.keySet()) {
-            sb.append(source.getRouterID()).append(" ");
+            sb.append("SRC: " + source.getRouterID()).append(" ");
             HashMap<Router, outputTuple> map = table.get(source);
             for (Router dest : map.keySet()) {
                 outputTuple tuple = map.get(dest);
                 Router via = tuple.getVia();
                 double numberOfHops = tuple.getNumberOfHops();
-                sb.append(via.getRouterID()+",").append(numberOfHops).append(" ");
+                sb.append("TO: " + dest.getRouterID() + " VIA: " + via.getRouterID()  ).append(",").append(numberOfHops).append(" ");
             }
             sb.append("\n");
         }
@@ -219,8 +224,10 @@ public class VectorRoutingSim {
             StringBuilder sb = new StringBuilder();
 
             if (flag == 1) {
-                HashMap<Router, HashMap<Router, outputTuple>> table = simulator.createTable();
-                //do something with this
+                String table = simulator.createPrintable(simulator.createTable());
+
+                sb.append(table).append("\n");
+
             }
 
             while (true) {
@@ -296,5 +303,5 @@ public class VectorRoutingSim {
             System.out.println(sb.toString());
         }
 
-    }//PUT NEWLINE AT END OF PRINT TABLE
+    }
 }

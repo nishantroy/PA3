@@ -165,7 +165,10 @@ class RoutingTable implements Serializable {
                     }
                 }
             }
-            if (fastestPath.get(dest) != null && !fastestPath.get(dest).equals(currFastest)) {
+            if (fastestPath.get(dest) == null) {
+                updated = true;
+                fastestPath.put(dest, currFastest);
+            } else if (!fastestPath.get(dest).equals(currFastest)) {
                 updated = true;
                 fastestPath.put(dest, currFastest);
             }

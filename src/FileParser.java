@@ -85,6 +85,12 @@ class FileParser {
             }
         }
 
+        for (Router source : network.getNetwork().vertexSet()) {
+            for (Router neighbor : network.getNeighbors(source)) {
+                source.getRoutingTable().setFastestPath(neighbor, neighbor);
+            }
+        }
+
 //        network.printNetwork();
 //        network.printRoutingTables();
         return network;

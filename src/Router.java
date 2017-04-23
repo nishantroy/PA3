@@ -98,55 +98,55 @@ class Router implements Serializable {
         viaMap.setCost(via, cost);
     }
 
-    /**
-     * Receives routing table from neighbor, updates routing table accordingly.
-     * TODO: NOT WORKING PROPERLY AFTER EVENT OCCURS IT SEEMS
-     * @param broadcaster Router broadcasting its routing table
-     * @return True if routing table was updated
-     */
-    boolean receiveBroadcast(Router broadcaster) {
-        setChanged(false);
-
-        // Get received routing table
-
-        RoutingTable broadcasterRoutingTable = broadcaster.getRoutingTable();
-        HashMap<Router, ViaMap> broadcast = broadcasterRoutingTable.getTable();
-
-
-        // Get cost and number of hops to broadcaster
-        Router fastestVia = routingTable.getFastestPath(broadcaster);
-        double costToBroadcaster = routingTable.getCost(broadcaster, fastestVia);
-        double hopsToBroadcaster = routingTable.getNumHops(broadcaster, fastestVia);
-
-        for (Router dest : broadcast.keySet()) {
-
-            // Get broadcast viaMap
-            ViaMap receivedViaMap = broadcast.get(dest);
-            HashMap<Router, Tuple> viaVector = receivedViaMap.getMap();
-
-            ViaMap myViaMap = getRoutingTable().getTable().get(dest);
-
-            for (Router via : viaVector.keySet()) {
-                if (getRouterID() == dest.getRouterID()) {
-                    continue;
-                }
-                Tuple broadcastInfo = viaVector.get(via);
-                double broadcastCost = broadcastInfo.getCost();
-                double broadcastHops = broadcastInfo.getNumberOfHops();
-                double totalCost = broadcastCost + costToBroadcaster;
-                double totalHops = broadcastHops + hopsToBroadcaster;
-                if (!myViaMap.hasEntry(broadcaster) || totalCost < myViaMap.getCost(broadcaster)) {
-                    setChanged(true);
-                    System.out.println("FOUND NEW PATH FROM " + this + " TO " + dest + " VIA " + via);
-                    updateTable(dest, broadcaster, totalCost, totalHops);
-                }
-
-            }
-
-        }
-
-        return isChanged();
-    }
+//    /**
+//     * Receives routing table from neighbor, updates routing table accordingly.
+//     * TODO: NOT WORKING PROPERLY AFTER EVENT OCCURS IT SEEMS
+//     * @param broadcaster Router broadcasting its routing table
+//     * @return True if routing table was updated
+//     */
+//    boolean receiveBroadcast(Router broadcaster) {
+//        setChanged(false);
+//
+//        // Get received routing table
+//
+//        RoutingTable broadcasterRoutingTable = broadcaster.getRoutingTable();
+//        HashMap<Router, ViaMap> broadcast = broadcasterRoutingTable.getTable();
+//
+//
+//        // Get cost and number of hops to broadcaster
+//        Router fastestVia = routingTable.getFastestPath(broadcaster);
+//        double costToBroadcaster = routingTable.getCost(broadcaster, fastestVia);
+//        double hopsToBroadcaster = routingTable.getNumHops(broadcaster, fastestVia);
+//
+//        for (Router dest : broadcast.keySet()) {
+//
+//            // Get broadcast viaMap
+//            ViaMap receivedViaMap = broadcast.get(dest);
+//            HashMap<Router, Tuple> viaVector = receivedViaMap.getMap();
+//
+//            ViaMap myViaMap = getRoutingTable().getTable().get(dest);
+//
+//            for (Router via : viaVector.keySet()) {
+//                if (getRouterID() == dest.getRouterID()) {
+//                    continue;
+//                }
+//                Tuple broadcastInfo = viaVector.get(via);
+//                double broadcastCost = broadcastInfo.getCost();
+//                double broadcastHops = broadcastInfo.getNumberOfHops();
+//                double totalCost = broadcastCost + costToBroadcaster;
+//                double totalHops = broadcastHops + hopsToBroadcaster;
+//                if (!myViaMap.hasEntry(broadcaster) || totalCost < myViaMap.getCost(broadcaster)) {
+//                    setChanged(true);
+//                    System.out.println("FOUND NEW PATH FROM " + this + " TO " + dest + " VIA " + via);
+//                    updateTable(dest, broadcaster, totalCost, totalHops);
+//                }
+//
+//            }
+//
+//        }
+//
+//        return isChanged();
+//    }
 
     @Override
     public boolean equals(Object o) {
