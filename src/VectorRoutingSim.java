@@ -136,7 +136,7 @@ public class VectorRoutingSim {
                         if (oldCost != Double.POSITIVE_INFINITY) {
                             RoutingTable neighborRTable = neighbor.getRoutingTable();
                             double extraCost = neighborRTable.getCost(router, router);
-                            if(!routerRTable.getFastestPath(dest).equals(neighbor)){
+                                if(!routerRTable.getFastestPath(dest).equals(neighbor)){
                                 double updatedCost = oldCost + extraCost;
                                 boolean changed = neighborRTable.setCost(dest, router, updatedCost);
                                 if (changed) {
@@ -153,9 +153,20 @@ public class VectorRoutingSim {
                         }
 
 
-//                    } else {
-//                        routerRTable.setFastestPath();
-//                    }
+                    }
+//
+                    else {
+                        double cost = copiedRoutersTables.get(router).getCost(dest, router);
+                        RoutingTable neighborRTable = neighbor.getRoutingTable();
+                        boolean changed = neighborRTable.setCost(dest, router, cost);
+                        if (changed) {
+                            double count = copiedRoutersTables.get(router).getNumHops(dest, router) + 1;
+                            neighborRTable.setNumHops(dest, router, count);
+                            neighbor.setChanged(true);
+                        }
+                        if (!updated && changed) {
+                            updated = true;
+                        }
                     }
 
                 }
