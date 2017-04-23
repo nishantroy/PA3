@@ -1,9 +1,10 @@
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Sub-map in Routing Table
  */
-public class ViaMap {
+public class ViaMap implements Serializable {
     private HashMap<Router, Tuple> map;
 
     public ViaMap() {

@@ -12,6 +12,36 @@ public class VectorRoutingSim {
     private Network network;
     private PriorityQueue<TopologicalEvent> events;
 
+    private class outputTuple {
+        Router via;
+        double numberOfHops;
+
+        outputTuple() {
+            super();
+        }
+
+        outputTuple(Router via, double numberOfHops) {
+            this.via = via;
+            this.numberOfHops = numberOfHops;
+        }
+
+        public Router getVia() {
+            return via;
+        }
+
+        void setVia(Router via) {
+            this.via = via;
+        }
+
+        public double getNumberOfHops() {
+            return numberOfHops;
+        }
+
+        void setNumberOfHops(double numberOfHops) {
+            this.numberOfHops = numberOfHops;
+        }
+    }
+
     private VectorRoutingSim(Network network, PriorityQueue<TopologicalEvent> events) {
         this.network = network;
         this.events = events;
@@ -93,7 +123,7 @@ public class VectorRoutingSim {
         return roundEvents;
     }
 
-    public static Object deepClone(Object object) {
+    private static Object deepClone(Object object) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -107,6 +137,57 @@ public class VectorRoutingSim {
             return null;
         }
     }
+
+    private HashMap<Router, HashMap<Router, outputTuple>> createTable() {
+
+        HashMap<Router, HashMap<Router, outputTuple>> out = new HashMap<>();
+
+        Network network = this.network;
+
+        for (Router router : network.getNetwork().vertexSet()) {
+            HashMap<Router, outputTuple> map = new HashMap<>();
+            HashMap<Router, Router> fastestPaths = router.getRoutingTable().getAllFastestPaths();
+            map.put(router, new outputTuple(router, 0));
+            for (Router dest : fastestPaths.keySet()) {
+                Router via = fastestPaths.get(dest);
+                double cost = router.getRoutingTable().getCost(dest, via);
+                map.put(dest, new outputTuple(via, cost));
+            }
+            out.put(router, map);
+        }
+        return out;
+    }
+
+    private String createPrintable(HashMap<Router, HashMap<Router, outputTuple>> table) {
+        StringBuilder sb = new StringBuilder();
+        for (Router source : table.keySet()) {
+            sb.append(source.getRouterID()).append(" ");
+            HashMap<Router, outputTuple> map = table.get(source);
+            for (Router dest : map.keySet()) {
+                outputTuple tuple = map.get(dest);
+                Router via = tuple.getVia();
+                double numberOfHops = tuple.getNumberOfHops();
+                sb.append(via.getRouterID()+",").append(numberOfHops).append(" ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    private boolean countToInf() {
+        HashMap<Router, HashMap<Router, outputTuple>> table = createTable();
+
+        for (Router source : table.keySet()) {
+            for (Router dest : table.get(source).keySet()) {
+                if (table.get(source).get(dest).getNumberOfHops() > 100) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
 
     public static void main(String[] args) throws Exception {
 
@@ -138,9 +219,7 @@ public class VectorRoutingSim {
             StringBuilder sb = new StringBuilder();
 
             if (flag == 1) {
-                double[][] table = makeTable(network, true);
-                sb.append("ROUND 1\n");
-                sb.append(printTable(table));
+                HashMap<Router, HashMap<Router, outputTuple>> table = simulator.createTable();
                 //do something with this
             }
 
@@ -155,10 +234,10 @@ public class VectorRoutingSim {
                         updated = simulator.regularRouting();
                         break;
                     case "Split Horizon":
-                        updated = simulator.splitHorizon();
+                        simulator.splitHorizon(0);
                         break;
                     case "Poison Reverse":
-                        updated = simulator.poisonReverse();
+                        simulator.poisonReverse(0);
                         break;
                 }
 
@@ -170,15 +249,17 @@ public class VectorRoutingSim {
                     break;
                 }
 
-                double[][] table = makeTable(network);
+
                 if (flag == 1) {
                     sb.append("Round " );
                     sb.append(roundNumber);
                     sb.append("\n");
-                    sb.append(printTable(table));
+                    HashMap<Router, HashMap<Router, outputTuple>> networkTable = simulator.createTable();
+                    String table = simulator.createPrintable(networkTable);
+                    sb.append(table).append("\n");
                 }
 
-                if (countToInf(table)) {
+                if (simulator.countToInf()) {
                     System.out.println("Count to infinity problem reached");
                     System.exit(1);
                 }
@@ -186,8 +267,8 @@ public class VectorRoutingSim {
                 roundNumber++;
             }
             if (flag == 0) {
-                double[][] table = makeTable(network);
-                sb.append(printTable());
+                String table = simulator.createPrintable(simulator.createTable());
+                sb.append(table).append("\n");
             }
             int convergenceDelay = roundNumber - lastEvent;
             sb.append("Convergence delay: ");

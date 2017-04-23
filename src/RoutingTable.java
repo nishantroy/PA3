@@ -20,11 +20,11 @@ class RoutingTable implements Serializable {
     private HashMap<Router, Router> hops;
     private Router router;
 
-    RoutingTable(int numberOfRouters, Router router) {
-        this.table = new HashMap<>(numberOfRouters);
-        this.fastestPath = new HashMap<>(numberOfRouters);
+    RoutingTable(Router router) {
+        this.table = new HashMap<>();
+        this.fastestPath = new HashMap<>();
         this.router = router;
-        this.hops = new HashMap<>(numberOfRouters);
+        this.hops = new HashMap<>();
     }
 
     HashMap<Router, ViaMap> getTable() {
@@ -133,6 +133,10 @@ class RoutingTable implements Serializable {
 
     }
 
+    public HashMap<Router, Router> getAllFastestPaths() {
+        return fastestPath;
+    }
+
     void setFastestPath(Router dest, Router via) {
         fastestPath.put(dest, via);
     }
@@ -161,7 +165,7 @@ class RoutingTable implements Serializable {
                     }
                 }
             }
-            if (!fastestPath.get(dest).equals(currFastest)) {
+            if (fastestPath.get(dest) != null && !fastestPath.get(dest).equals(currFastest)) {
                 updated = true;
                 fastestPath.put(dest, currFastest);
             }

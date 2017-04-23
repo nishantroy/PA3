@@ -13,20 +13,12 @@ import java.util.PriorityQueue;
 
 class Router implements Serializable {
     private int routerID;
-//    private RoutingVector routingVector;
     private RoutingTable routingTable;
     private boolean changed;
 
     Router(int routerID) {
         this.routerID = routerID;
-//        this.routingVector = new RoutingVector();
-        this.routingTable = new RoutingTable();
-    }
-
-    Router(Router router) {
-        this.routerID = router.getRouterID();
-        this.routingTable = router.getRoutingTable();
-        this.changed = router.isChanged();
+        this.routingTable = new RoutingTable(this);
     }
 
     public int getRouterID() {
@@ -36,10 +28,6 @@ class Router implements Serializable {
     public RoutingTable getRoutingTable() {
         return routingTable;
     }
-
-//    public RoutingVector getRoutingVector() {
-//        return routingVector;
-//    }
 
 
     /**
@@ -58,18 +46,6 @@ class Router implements Serializable {
         this.changed = changed;
     }
 
-    /**
-     * Updates the routing vector (shortest path to all other routers)
-     * @param target Router to update path for
-     * @param cost Cost to that router
-     * @param numberOfHops # of hops to that router
-     * @param nextHop Next hop to take to reach that router
-     */
-//    public void updateVector(Router target, double cost, double numberOfHops, Router nextHop) {
-//        routingVector.setCost(target, cost);
-//        routingVector.setNumberOfHops(target, numberOfHops);
-//        setChanged(true);
-//    }
 
     /**
      * Updates the full routing table (path from R1 to R2 via RX)
