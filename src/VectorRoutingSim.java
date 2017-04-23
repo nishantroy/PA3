@@ -155,19 +155,19 @@ public class VectorRoutingSim {
 
                     }
 //
-                    else {
-                        double cost = copiedRoutersTables.get(router).getCost(dest, router);
-                        RoutingTable neighborRTable = neighbor.getRoutingTable();
-                        boolean changed = neighborRTable.setCost(dest, router, cost);
-                        if (changed) {
-                            double count = copiedRoutersTables.get(router).getNumHops(dest, router) + 1;
-                            neighborRTable.setNumHops(dest, router, count);
-                            neighbor.setChanged(true);
-                        }
-                        if (!updated && changed) {
-                            updated = true;
-                        }
-                    }
+//                    else {
+//                        double cost = copiedRoutersTables.get(router).getCost(dest, router);
+//                        RoutingTable neighborRTable = neighbor.getRoutingTable();
+//                        boolean changed = neighborRTable.setCost(dest, router, cost);
+//                        if (changed) {
+//                            double count = copiedRoutersTables.get(router).getNumHops(dest, router) + 1;
+//                            neighborRTable.setNumHops(dest, router, count);
+//                            neighbor.setChanged(true);
+//                        }
+//                        if (!updated && changed) {
+//                            updated = true;
+//                        }
+//                    }
 
                 }
             }
@@ -314,7 +314,6 @@ public class VectorRoutingSim {
 
 
     public static void main(String[] args) throws Exception {
-
 
         if (args.length != 3) {
             throw new IllegalArgumentException("Please enter arguments as: <File with network topology> " +

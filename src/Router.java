@@ -161,7 +161,7 @@ class Router implements Serializable {
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(routerID);
+        return routerID;
     }
 
     @Override

@@ -93,8 +93,8 @@ class Network implements Serializable{
                 dest = network.getEdgeTarget(edge);
             }
 
-            network.addEdge(source, dest);
-            network.setEdgeWeight(network.getEdge(source, dest), cost);
+            addLink(source, dest);
+            setLinkWeight(source, dest, cost);
         }
     }
 
@@ -103,7 +103,7 @@ class Network implements Serializable{
      * @param events Event list to execute
      */
     void executeEventsAndUpdate (HashSet<TopologicalEvent> events) {
-        updateNetworkGraph(events);
+//        updateNetworkGraph(events);
 
         for (TopologicalEvent event: events) {
             Router R1 = new Router(event.getSourceRouterID());
@@ -115,11 +115,34 @@ class Network implements Serializable{
 
             addRouter(R1);
             addRouter(R2);
+
+            if (network.containsVertex(R1)) {
+                Set<Router> routers = network.vertexSet();
+
+                for (Router router : routers) {
+                    if (R1.equals(router)) {
+                        R1 = router;
+                        break;
+                    }
+                }
+            }
+
+            if (network.containsVertex(R2)) {
+                Set<Router> routers = network.vertexSet();
+
+                for (Router router : routers) {
+                    if (R2.equals(router)) {
+                        R2 = router;
+                        break;
+                    }
+                }
+            }
+
             addLink(R1, R2);
             setLinkWeight(R1, R2, cost);
             DefaultEdge edge = getNetwork().getEdge(R1, R2);
-            R1 = getNetwork().getEdgeSource(edge);
-            R2 = getNetwork().getEdgeTarget(edge);
+            R1 = network.getEdgeSource(edge);
+            R2 = network.getEdgeTarget(edge);
 
             if (cost == Double.POSITIVE_INFINITY) {
                 for (Router router : network.vertexSet()) {
@@ -294,9 +317,8 @@ class Network implements Serializable{
         for (DefaultEdge edge : network.edgeSet()) {
             Router source = network.getEdgeSource(edge);
             Router dest = network.getEdgeTarget(edge);
-//            HashMap<Router, Tuple> map = source.getRoutingVector().getVector();
-//            double cost = map.containsKey(dest) ? map.get(dest).getCost() : -1;
-//            sb.append(source).append("\t\t|\t").append(dest).append("\t\t|\t").append(cost).append("\n");
+            double cost = network.getEdgeWeight(edge);
+            sb.append(source).append("\t\t|\t").append(dest).append("\t\t|\t").append(cost).append("\n");
         }
         return sb.toString();
     }
