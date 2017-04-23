@@ -111,7 +111,7 @@ class RoutingTable implements Serializable {
             viaMap = table.get(dest);
             viaMap.setCost(via, cost);
             return true;
-        } else if (cost < getCost(dest, via) || fastestPath.get(dest) == via) {
+        } else if (cost < getCost(dest, via) || fastestPath.get(dest).equals(via)) {
             viaMap = table.get(dest);
             viaMap.setCost(via, cost);
             return true;

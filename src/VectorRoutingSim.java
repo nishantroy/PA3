@@ -358,7 +358,7 @@ public class VectorRoutingSim {
                         updated = simulator.splitHorizon();
                         break;
                     case "Poison Reverse":
-                        simulator.poisonReverse();
+                        updated = simulator.poisonReverse();
                         break;
                 }
 
