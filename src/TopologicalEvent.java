@@ -37,7 +37,7 @@ public class TopologicalEvent implements Comparable<TopologicalEvent> {
     public int compareTo(TopologicalEvent o) {
         if (o == this || o.getRound() == this.getRound()) {
             return 0;
-        } else if (o.getRound() < this.getRound()) {
+        } else if (o.getRound() > this.getRound()) {
             return -1;
         } else {
             return 1;
