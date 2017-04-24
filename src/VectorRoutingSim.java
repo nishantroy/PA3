@@ -154,20 +154,6 @@ public class VectorRoutingSim {
 
 
                     }
-//
-//                    else {
-//                        double cost = copiedRoutersTables.get(router).getCost(dest, router);
-//                        RoutingTable neighborRTable = neighbor.getRoutingTable();
-//                        boolean changed = neighborRTable.setCost(dest, router, cost);
-//                        if (changed) {
-//                            double count = copiedRoutersTables.get(router).getNumHops(dest, router) + 1;
-//                            neighborRTable.setNumHops(dest, router, count);
-//                            neighbor.setChanged(true);
-//                        }
-//                        if (!updated && changed) {
-//                            updated = true;
-//                        }
-//                    }
 
                 }
             }
@@ -270,6 +256,17 @@ public class VectorRoutingSim {
 
         for (Router router : network.getNetwork().vertexSet()) {
             HashMap<Router, outputTuple> map = new HashMap<>();
+            Router emptyVia = new Router(-1);
+            double emptyHops = -1;
+
+            for (Router dest : network.getNetwork().vertexSet()) {
+                map.put(dest, new outputTuple(emptyVia, emptyHops));
+            }
+            out.put(router, map);
+        }
+
+        for (Router router : network.getNetwork().vertexSet()) {
+            HashMap<Router, outputTuple> map = out.get(router);
             HashMap<Router, Router> fastestPaths = router.getRoutingTable().getAllFastestPaths();
             map.put(router, new outputTuple(router, 0));
             for (Router dest : fastestPaths.keySet()) {
@@ -285,13 +282,13 @@ public class VectorRoutingSim {
     private String createPrintable(HashMap<Router, HashMap<Router, outputTuple>> table) {
         StringBuilder sb = new StringBuilder();
         for (Router source : table.keySet()) {
-            sb.append("SRC: ").append(source.getRouterID()).append(" ");
+            sb.append(source.getRouterID()).append("\t\t");
             HashMap<Router, outputTuple> map = table.get(source);
             for (Router dest : map.keySet()) {
                 outputTuple tuple = map.get(dest);
                 Router via = tuple.getVia();
                 double numberOfHops = tuple.getNumberOfHops();
-                sb.append("TO: ").append(dest.getRouterID()).append(" VIA: ").append(via.getRouterID()).append(",").append(numberOfHops).append(" ");
+                sb.append(via.getRouterID()).append(",").append(numberOfHops).append("\t\t");
             }
             sb.append("\n");
         }
@@ -331,7 +328,6 @@ public class VectorRoutingSim {
         PriorityQueue<TopologicalEvent> originalEvents = fileParser.readTopologicalEvents(eventFile);
 
         for (String algorithm : routingAlgorithms) {
-            System.out.println("ALGORITHM: " + algorithm);
             Network networkCopy = (Network)deepClone(originalNetwork);
             Network network = new Network(networkCopy);
             //Network network = new Network(originalNetwork);
@@ -348,6 +344,7 @@ public class VectorRoutingSim {
             StringBuilder sb = new StringBuilder();
 
             if (flag == 1) {
+                sb.append("Round ").append(roundNumber).append("\n");
                 String table = simulator.createPrintable(simulator.createTable());
 
                 sb.append(table).append("\n");
@@ -383,7 +380,7 @@ public class VectorRoutingSim {
 
                 if (flag == 1) {
                     sb.append("Round " );
-                    sb.append(roundNumber);
+                    sb.append(roundNumber+1);
                     sb.append("\n");
                     HashMap<Router, HashMap<Router, outputTuple>> networkTable = simulator.createTable();
                     String table = simulator.createPrintable(networkTable);
@@ -394,7 +391,6 @@ public class VectorRoutingSim {
                     System.out.println("Count to infinity problem reached");
                     System.exit(1);
                 }
-                System.out.println(roundNumber);
                 roundNumber++;
             }
             if (flag == 0) {
@@ -424,7 +420,12 @@ public class VectorRoutingSim {
             }
             filename.append(".txt");
             //NEED TO ADD FILE OUTPUT
-            System.out.println(sb.toString());
+            BufferedWriter bw = new BufferedWriter(new FileWriter(filename.toString()));
+            bw.write(sb.toString());
+            bw.flush();
+            bw.close();
+
+//            System.out.println(sb.toString());
         }
 
     }
