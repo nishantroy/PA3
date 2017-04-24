@@ -1,5 +1,3 @@
-import org.jgrapht.graph.DefaultEdge;
-
 import java.io.File;
 import java.util.*;
 
@@ -54,15 +52,7 @@ class FileParser {
 
             // Initialize routing tables
             routerSource.updateTable(routerDest, routerDest, cost, 1);
-//            routerSource.updateTable(routerSource, routerSource, 0, 0);
             routerDest.updateTable(routerSource, routerSource, cost, 1);
-//            routerDest.updateTable(routerDest, routerDest, 0, 0);
-
-            //Initialize routing vectors
-//            routerSource.updateVector(routerDest, cost, 1, routerDest);
-//            routerSource.updateVector(routerSource, 0, 0, routerSource);
-//            routerDest.updateVector(routerSource, cost, 1, routerSource);
-//            routerDest.updateVector(routerDest, 0, 0, routerDest);
 
             // Store links to add to network
             if (networkLinks.containsKey(routerSource)) {
@@ -91,8 +81,6 @@ class FileParser {
             }
         }
 
-//        network.printNetwork();
-//        network.printRoutingTables();
         return network;
     }
 

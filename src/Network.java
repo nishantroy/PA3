@@ -78,33 +78,11 @@ class Network implements Serializable{
     }
 
 
-    private void updateNetworkGraph (HashSet<TopologicalEvent> events) {
-        for(TopologicalEvent event : events) {
-            Double cost = event.getCost();
-            if (cost == -1) {
-                cost = Double.POSITIVE_INFINITY;
-            }
-            Router source = new Router(event.getSourceRouterID());
-            Router dest = new Router(event.getDestRouterID());
-
-            if (network.containsEdge(source, dest)) {
-                DefaultEdge edge = network.getEdge(source, dest);
-                source = network.getEdgeSource(edge);
-                dest = network.getEdgeTarget(edge);
-            }
-
-            addLink(source, dest);
-            setLinkWeight(source, dest, cost);
-        }
-    }
-
     /**
      * Executes topological events. Adds/Removes links as necessary, and changes all the routing tables.
      * @param events Event list to execute
      */
     void executeEventsAndUpdate (HashSet<TopologicalEvent> events) {
-//        updateNetworkGraph(events);
-
         for (TopologicalEvent event: events) {
             Router R1 = new Router(event.getSourceRouterID());
             Router R2 = new Router(event.getDestRouterID());
@@ -161,83 +139,44 @@ class Network implements Serializable{
             HashSet<Router> r1Neigbors = getNeighbors(R1);
             HashSet<Router> r2Neigbors = getNeighbors(R2);
 
-            for (Router neighbor : r1Neigbors) {
+            updateNeighbors(R1, R2, r1Neigbors, cost);
+            updateNeighbors(R2, R1, r2Neigbors, cost);
 
-                if (neighbor.equals(R2)) continue;
-
-                double costNeighborToR2 = getLinkWeight(neighbor, R2);
-                double costNeighborToR1 = getLinkWeight(neighbor, R1);
-
-                if (costNeighborToR2 != Double.POSITIVE_INFINITY ) {
-                    double costUpdate;
-                    if (cost != Double.POSITIVE_INFINITY) {
-                        costUpdate = cost + costNeighborToR2;
-                    } else {
-                        costUpdate = Double.POSITIVE_INFINITY;
-                    }
-                    neighbor.updateCost(R1, R2, costUpdate);
-                    neighbor.setChanged(true);
-                }
-
-                if (costNeighborToR1 != Double.POSITIVE_INFINITY ) {
-                    double costUpdate;
-                    if (cost != Double.POSITIVE_INFINITY) {
-                        costUpdate = cost + costNeighborToR1;
-                    } else {
-                        costUpdate = Double.POSITIVE_INFINITY;
-                    }
-                    neighbor.updateCost(R2, R1, costUpdate);
-                    neighbor.setChanged(true);
-                }
-
-            }
-
-                for (Router neighbor : r2Neigbors) {
-                    if (neighbor.equals(R1)) continue;
-
-                    double costNeighborToR1 = getLinkWeight(neighbor, R1);
-                    double costNeighborToR2 = getLinkWeight(neighbor, R2);
-
-                    if (costNeighborToR2 != Double.POSITIVE_INFINITY) {
-                        double costUpdate;
-                        if (cost != Double.POSITIVE_INFINITY) {
-                            costUpdate = cost + costNeighborToR2;
-                        } else {
-                            costUpdate = Double.POSITIVE_INFINITY;
-                        }
-                        neighbor.updateCost(R1, R2, costUpdate);
-                        neighbor.setChanged(true);
-
-                    }
-
-                    if (costNeighborToR1 != Double.POSITIVE_INFINITY) {
-                        double costUpdate;
-                        if (cost != Double.POSITIVE_INFINITY) {
-                            costUpdate = cost + costNeighborToR1;
-                        } else {
-                            costUpdate = Double.POSITIVE_INFINITY;
-                        }
-                        neighbor.updateCost(R2, R1, costUpdate);
-                        neighbor.setChanged(true);
-
-                    }
-
-                }
             }
     }
 
-//    /**
-//     * Checks if no router was changed
-//     * @return True if protocol converged
-//     */
-//    boolean isConverged() {
-//        for (Router router : network.vertexSet()) {
-//            if (router.isChanged()) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
+    void updateNeighbors(Router R1, Router R2, HashSet<Router> neighbors, double cost) {
+        for (Router neighbor : neighbors) {
+
+            if (neighbor.equals(R2)) continue;
+
+            double costNeighborToR2 = getLinkWeight(neighbor, R2);
+            double costNeighborToR1 = getLinkWeight(neighbor, R1);
+
+            if (costNeighborToR2 != Double.POSITIVE_INFINITY ) {
+                double costUpdate;
+                if (cost != Double.POSITIVE_INFINITY) {
+                    costUpdate = cost + costNeighborToR2;
+                } else {
+                    costUpdate = Double.POSITIVE_INFINITY;
+                }
+                neighbor.updateCost(R1, R2, costUpdate);
+                neighbor.setChanged(true);
+            }
+
+            if (costNeighborToR1 != Double.POSITIVE_INFINITY ) {
+                double costUpdate;
+                if (cost != Double.POSITIVE_INFINITY) {
+                    costUpdate = cost + costNeighborToR1;
+                } else {
+                    costUpdate = Double.POSITIVE_INFINITY;
+                }
+                neighbor.updateCost(R2, R1, costUpdate);
+                neighbor.setChanged(true);
+            }
+
+        }
+    }
 
     /**
      * Returns all neighboring routers
@@ -275,38 +214,7 @@ class Network implements Serializable{
         }
     }
 
-//    /**
-//     * Prints out the routing vectors (shortest paths) for all routers
-//     */
-//    void printRoutingVectors() {
-//        StringBuilder sb = new StringBuilder();
-//        for (Router router : network.vertexSet()) {
-////            sb.append(router.getVectorPrint());
-//        }
-//        System.out.println(sb.toString());
-//    }
 
-//    /**
-//     * Prints out the whole routing tables (path from R1 to R2 via RX) for all routers
-//     */
-//    void printRoutingTables() {
-//        StringBuilder sb = new StringBuilder();
-//        for (Router router : network.vertexSet()) {
-//            sb.append("TABLE FOR ROUTER #" + router + "\n\n");
-//            sb.append(router.getRoutingTable().toString());
-//        }
-//        System.out.println(sb.toString());
-//    }
-
-//    void printFastestPaths() {
-//        StringBuilder sb = new StringBuilder();
-//        for (Router router : network.vertexSet()) {
-//            sb.append("\nFastest path from " + router + ":\n");
-//            sb.append(router.getRoutingTable().printFastestPath());
-//
-//        }
-//        System.out.println(sb.toString());
-//    }
 
     @Override
     public String toString() {

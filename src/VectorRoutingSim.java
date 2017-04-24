@@ -1,6 +1,3 @@
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleWeightedGraph;
-
 import java.io.*;
 import java.util.*;
 
@@ -16,10 +13,6 @@ public class VectorRoutingSim {
         Router via;
         double numberOfHops;
 
-        outputTuple() {
-            super();
-        }
-
         outputTuple(Router via, double numberOfHops) {
             this.via = via;
             this.numberOfHops = numberOfHops;
@@ -33,24 +26,25 @@ public class VectorRoutingSim {
             this.via = via;
         }
 
-        public double getNumberOfHops() {
+        double getNumberOfHops() {
             return numberOfHops;
         }
 
-        void setNumberOfHops(double numberOfHops) {
-            this.numberOfHops = numberOfHops;
-        }
     }
 
+    /**
+     * Constructor for simulator
+     * @param network Network to simulate
+     * @param events Events to simulate
+     */
     private VectorRoutingSim(Network network, PriorityQueue<TopologicalEvent> events) {
         this.network = network;
         this.events = events;
     }
 
     /**
-     * Basic Bellman-Ford Routing
-     *
-     * @return something
+     * Runs the Bellman-Ford algorithm for distance vector routing
+     * @return True if any routers updated their routing table
      */
     private boolean regularRouting() {
         Boolean updated = false;
@@ -60,7 +54,6 @@ public class VectorRoutingSim {
         for (Router router : routers) {
             Router routerCopy = (Router) deepClone(router);
             copiedRoutersTables.put(router, routerCopy.getRoutingTable());
-            //routersCopy.add((Router)deepClone(router));
         }
 
         for (Router router : routers) {
@@ -93,10 +86,6 @@ public class VectorRoutingSim {
 
                         }
 
-
-//                    } else {
-//                        routerRTable.setFastestPath();
-//                    }
                     }
 
                 }
@@ -108,15 +97,17 @@ public class VectorRoutingSim {
     }
 
 
+    /**
+     * Runs the split horizon algorithm for distance vector routing
+     * @return True if any routers updated their routing table
+     */
     private boolean splitHorizon() {
         Boolean updated = false;
         Set<Router> routers = network.getNetwork().vertexSet();
-        //Set<Router> routersCopy = new HashSet<>();
         HashMap<Router, RoutingTable> copiedRoutersTables = new HashMap<>();
         for (Router router : routers) {
             Router routerCopy = (Router) deepClone(router);
             copiedRoutersTables.put(router, routerCopy.getRoutingTable());
-            //routersCopy.add((Router)deepClone(router));
         }
 
         for (Router router : routers) {
@@ -162,7 +153,11 @@ public class VectorRoutingSim {
         return updated;
     }
 
-    private boolean poisonReverse() {
+    /**
+     * Runs the poison-reverse algorithm for distance vector routing
+     * @return True if any routers updated their routing table
+     */
+    private boolean splitHorizonPoisonReverse() {
         Boolean updated = false;
         Set<Router> routers = network.getNetwork().vertexSet();
         //Set<Router> routersCopy = new HashSet<>();
@@ -170,7 +165,6 @@ public class VectorRoutingSim {
         for (Router router : routers) {
             Router routerCopy = (Router) deepClone(router);
             copiedRoutersTables.put(router, routerCopy.getRoutingTable());
-            //routersCopy.add((Router)deepClone(router));
         }
 
         for (Router router : routers) {
@@ -210,11 +204,6 @@ public class VectorRoutingSim {
 
 
                         }
-
-
-//                    } else {
-//                        routerRTable.setFastestPath();
-//                    }
                     }
 
                 }
@@ -224,6 +213,11 @@ public class VectorRoutingSim {
         return updated;
     }
 
+    /**
+     * Gets the topological events for a given round
+     * @param roundNumber Round to get events for
+     * @return PQ of events sorted by round number
+     */
     private HashSet<TopologicalEvent> getEventsByRound(int roundNumber) {
         HashSet<TopologicalEvent> roundEvents = new HashSet<>();
         while (!events.isEmpty() && roundNumber == events.peek().getRound()) {
@@ -233,6 +227,11 @@ public class VectorRoutingSim {
         return roundEvents;
     }
 
+    /**
+     * Creates a new copy of an object
+     * @param object Object to clone
+     * @return Clone of object
+     */
     private static Object deepClone(Object object) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -248,6 +247,10 @@ public class VectorRoutingSim {
         }
     }
 
+    /**
+     * Creates routing table from network
+     * @return HashMap representing routing table
+     */
     private HashMap<Router, HashMap<Router, outputTuple>> createTable() {
 
         HashMap<Router, HashMap<Router, outputTuple>> out = new HashMap<>();
@@ -279,6 +282,11 @@ public class VectorRoutingSim {
         return out;
     }
 
+    /**
+     * Create table to print to file
+     * @param table Table to print
+     * @return String to print to file
+     */
     private String createPrintable(HashMap<Router, HashMap<Router, outputTuple>> table) {
         StringBuilder sb = new StringBuilder();
         for (Router source : table.keySet()) {
@@ -288,13 +296,17 @@ public class VectorRoutingSim {
                 outputTuple tuple = map.get(dest);
                 Router via = tuple.getVia();
                 double numberOfHops = tuple.getNumberOfHops();
-                sb.append(via.getRouterID()).append(",").append(numberOfHops).append("\t\t");
+                sb.append(via.getRouterID()).append(",").append((int) numberOfHops).append("\t\t");
             }
             sb.append("\n");
         }
         return sb.toString();
     }
 
+    /**
+     * Check if Count To Infinity problem occurred
+     * @return True if hops > 100 for some router
+     */
     private boolean countToInf() {
         HashMap<Router, HashMap<Router, outputTuple>> table = createTable();
 
@@ -330,9 +342,7 @@ public class VectorRoutingSim {
         for (String algorithm : routingAlgorithms) {
             Network networkCopy = (Network)deepClone(originalNetwork);
             Network network = new Network(networkCopy);
-            //Network network = new Network(originalNetwork);
             PriorityQueue<TopologicalEvent> eventsCopy = (PriorityQueue<TopologicalEvent>)deepClone(originalEvents);
-            //PriorityQueue<TopologicalEvent> events = new PriorityQueue<>(originalEvents);
             PriorityQueue<TopologicalEvent> events = new PriorityQueue<>(eventsCopy);
 
             VectorRoutingSim simulator = new VectorRoutingSim(network, events);
@@ -362,10 +372,10 @@ public class VectorRoutingSim {
                         updated = simulator.regularRouting();
                         break;
                     case "Split Horizon":
-                        updated = simulator.splitHorizon();
+                        updated = simulator.splitHorizonPoisonReverse();
                         break;
                     case "Poison Reverse":
-                        updated = simulator.poisonReverse();
+                        updated = simulator.splitHorizonPoisonReverse();
                         break;
                 }
 
@@ -419,13 +429,11 @@ public class VectorRoutingSim {
                 filename.append("-detailed");
             }
             filename.append(".txt");
-            //NEED TO ADD FILE OUTPUT
             BufferedWriter bw = new BufferedWriter(new FileWriter(filename.toString()));
             bw.write(sb.toString());
             bw.flush();
             bw.close();
 
-//            System.out.println(sb.toString());
         }
 
     }

@@ -4,10 +4,10 @@ import java.util.HashMap;
 /**
  * Sub-map in Routing Table
  */
-public class ViaMap implements Serializable {
+class ViaMap implements Serializable {
     private HashMap<Router, Tuple> map;
 
-    public ViaMap() {
+    ViaMap() {
         this.map = new HashMap<>();
     }
 
@@ -15,7 +15,7 @@ public class ViaMap implements Serializable {
         return map;
     }
 
-     boolean hasEntry(Router router) {
+    boolean hasEntry(Router router) {
         return map.containsKey(router);
     }
 
@@ -54,7 +54,7 @@ public class ViaMap implements Serializable {
             Tuple tuple = map.get(key);
             double cost = tuple.getCost();
             double hops = tuple.getNumberOfHops();
-            sb.append(key.getRouterID()+"\t\t|\t"+cost+"\t\t\t|\t"+hops+"\n\n");
+            sb.append(key.getRouterID() + "\t\t|\t" + cost + "\t\t\t|\t" + hops + "\n\n");
         }
         return sb.toString();
     }

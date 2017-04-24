@@ -17,14 +17,12 @@ class RoutingTable implements Serializable {
      */
     private HashMap<Router, Router> fastestPath;
 
-    private HashMap<Router, Router> hops;
     private Router router;
 
     RoutingTable(Router router) {
         this.table = new HashMap<>();
         this.fastestPath = new HashMap<>();
         this.router = router;
-        this.hops = new HashMap<>();
     }
 
     HashMap<Router, ViaMap> getTable() {
@@ -80,21 +78,6 @@ class RoutingTable implements Serializable {
         return Double.POSITIVE_INFINITY;
     }
 
-//    /**
-//     * Sets cost
-//     * @param dest Destination to set cost for
-//     * @param via Router we are going through
-//     * @param cost Cost of path
-//     */
-//    void setCostForEvent(Router dest, Router via, double cost) {
-//        ViaMap viaMap;
-//        if (!table.containsKey(dest)) {
-//            table.put(dest, new ViaMap());
-//        }
-//        viaMap = table.get(dest);
-//        viaMap.setCost(via, cost);
-//    }
-
     /**
      * Sets cost
      * @param dest Destination to set cost for
@@ -120,10 +103,6 @@ class RoutingTable implements Serializable {
         return false;
     }
 
-    void setHop(Router dest, Router via) {
-        hops.put(dest, via);
-    }
-
     Router getFastestPath(Router dest) {
 
         if (!fastestPath.containsKey(dest)) {
@@ -133,7 +112,7 @@ class RoutingTable implements Serializable {
 
     }
 
-    public HashMap<Router, Router> getAllFastestPaths() {
+    HashMap<Router, Router> getAllFastestPaths() {
         return fastestPath;
     }
 
@@ -142,14 +121,13 @@ class RoutingTable implements Serializable {
     }
 
     /**
-    *TODO: fix this
+     * Update Fastest Path Map for all routers in the network
      */
     boolean updateAllFastestPaths() {
         boolean updated = false;
         for (Router dest : table.keySet()) {
             if (!table.containsKey(dest)) {
                 fastestPath.put(dest, null);
-                hops.put(dest, null);
             }
             HashMap<Router, Tuple> map = table.get(dest).getMap();
             Router currFastest = null;
@@ -185,15 +163,6 @@ class RoutingTable implements Serializable {
             sb.append("Dest " + key + " Via:\n*********************\n\n");
             sb.append(table.get(key).toString());
 
-        }
-        return sb.toString();
-    }
-
-    String printFastestPath() {
-        StringBuilder sb = new StringBuilder();
-        for (Router router : fastestPath.keySet()) {
-            double cost = getCost(router, fastestPath.get(router));
-            sb.append("To " + router + " is via " + fastestPath.get(router) + " with cost " + cost + "\n");
         }
         return sb.toString();
     }

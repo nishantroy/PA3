@@ -21,11 +21,11 @@ class Router implements Serializable {
         this.routingTable = new RoutingTable(this);
     }
 
-    public int getRouterID() {
+    int getRouterID() {
         return routerID;
     }
 
-    public RoutingTable getRoutingTable() {
+    RoutingTable getRoutingTable() {
         return routingTable;
     }
 
@@ -60,15 +60,6 @@ class Router implements Serializable {
         }
         updateCost(dest, via, cost);
         routingTable.setNumHops(dest, via, numHops);
-
-
-//        this.routingTable.setCost(dest, via, cost);
-//        this.routingTable.setNumHops(dest, via, numHops);
-//        Router fastestVia = routingTable.getFastestPath(dest);
-//        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
-//            routingTable.setFastestPath(dest, via);
-//        }
-//        setChanged(true);
     }
 
     /**
@@ -82,13 +73,6 @@ class Router implements Serializable {
             return;
         }
 
-//        this.routingTable.setCost(dest, via, cost);
-//        Router fastestVia = routingTable.getFastestPath(dest);
-//        if (fastestVia == null || routingTable.getCost(dest, via) < routingTable.getCost(dest, fastestVia)) {
-//            routingTable.setFastestPath(dest, via);
-//        }
-//        setChanged(true);
-
         ViaMap viaMap;
         HashMap<Router, ViaMap> table = this.routingTable.getTable();
         if (!table.containsKey(dest)) {
@@ -97,56 +81,6 @@ class Router implements Serializable {
         viaMap = table.get(dest);
         viaMap.setCost(via, cost);
     }
-
-//    /**
-//     * Receives routing table from neighbor, updates routing table accordingly.
-//     * TODO: NOT WORKING PROPERLY AFTER EVENT OCCURS IT SEEMS
-//     * @param broadcaster Router broadcasting its routing table
-//     * @return True if routing table was updated
-//     */
-//    boolean receiveBroadcast(Router broadcaster) {
-//        setChanged(false);
-//
-//        // Get received routing table
-//
-//        RoutingTable broadcasterRoutingTable = broadcaster.getRoutingTable();
-//        HashMap<Router, ViaMap> broadcast = broadcasterRoutingTable.getTable();
-//
-//
-//        // Get cost and number of hops to broadcaster
-//        Router fastestVia = routingTable.getFastestPath(broadcaster);
-//        double costToBroadcaster = routingTable.getCost(broadcaster, fastestVia);
-//        double hopsToBroadcaster = routingTable.getNumHops(broadcaster, fastestVia);
-//
-//        for (Router dest : broadcast.keySet()) {
-//
-//            // Get broadcast viaMap
-//            ViaMap receivedViaMap = broadcast.get(dest);
-//            HashMap<Router, Tuple> viaVector = receivedViaMap.getMap();
-//
-//            ViaMap myViaMap = getRoutingTable().getTable().get(dest);
-//
-//            for (Router via : viaVector.keySet()) {
-//                if (getRouterID() == dest.getRouterID()) {
-//                    continue;
-//                }
-//                Tuple broadcastInfo = viaVector.get(via);
-//                double broadcastCost = broadcastInfo.getCost();
-//                double broadcastHops = broadcastInfo.getNumberOfHops();
-//                double totalCost = broadcastCost + costToBroadcaster;
-//                double totalHops = broadcastHops + hopsToBroadcaster;
-//                if (!myViaMap.hasEntry(broadcaster) || totalCost < myViaMap.getCost(broadcaster)) {
-//                    setChanged(true);
-//                    System.out.println("FOUND NEW PATH FROM " + this + " TO " + dest + " VIA " + via);
-//                    updateTable(dest, broadcaster, totalCost, totalHops);
-//                }
-//
-//            }
-//
-//        }
-//
-//        return isChanged();
-//    }
 
     @Override
     public boolean equals(Object o) {
@@ -169,12 +103,4 @@ class Router implements Serializable {
         return String.valueOf("ROUTER " + routerID);
     }
 
-//    public String getVectorPrint() {
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("***********************************************\n VECTOR FOR ROUTER" + getRouterID()
-//                + "\n***********************************************\n");
-//        sb.append(getRoutingVector().toString());
-//        sb.append("\n\n");
-//        return sb.toString();
-//    }
 }
